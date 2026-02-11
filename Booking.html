@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COCO Mala Booking - จองคิว</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Prompt', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: '#FF8B8B',     
+                        primaryLight: '#FFC5C5', 
+                        secondary: '#CFCFCF',
+                        error: '#FF6B6B',
+                        card: '#FFF0F0'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-white text-gray-800 font-sans" onclick="closeDropdown(event)">
+
+    <nav class="border-b border-gray-200 py-4 px-6 flex justify-between items-center bg-white sticky top-0 z-50">
+        <div class="flex items-center gap-2">
+            <div class="w-4 h-4 bg-black rounded-sm"></div> 
+            <span class="font-bold text-lg tracking-wide">COCO Mala Booking</span>
+        </div>
+        <ul class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
+            <li class="cursor-pointer hover:text-black">หน้าหลัก</li>
+            <li class="cursor-pointer hover:text-black"><a href="https://maps.app.goo.gl/69h3AdeuP8SHrQj68" target="_blank">แผนที่</a></li>
+            <li class="cursor-pointer hover:text-black">คิวของคุณ</li>
+            <li class="cursor-pointer hover:text-black">ออกจากระบบ</li>
+        </ul>
+    </nav>
+
+    <main class="max-w-xl mx-auto mt-12 px-4 pb-20">
+        
+        <div id="booking-section">
+            <h1 class="text-4xl font-medium text-center mb-10">จองคิว</h1>
+
+            <div class="space-y-5">
+                <div class="flex flex-col gap-1">
+                    <label for="name" class="font-medium text-gray-700">ชื่อ :</label>
+                    <input type="text" id="name" placeholder="ชื่อ" maxlength="30"
+                        oninput="checkFormCompletion(); clearError('name')"
+                        class="w-full border border-gray-200 rounded-lg p-3 text-gray-700 focus:outline-none focus:border-primary transition shadow-sm bg-white">
+                    <p id="error-name" class="text-error text-sm hidden">กรุณากรอกข้อมูล</p>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label for="phone" class="font-medium text-gray-700">เบอร์ :</label>
+                    <input type="tel" id="phone" placeholder="กรอกเบอร์" minlength="10" maxlength="10"
+                        oninput="validatePhone(this); checkFormCompletion(); clearError('phone')"
+                        class="w-full border border-gray-200 rounded-lg p-3 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-primary transition shadow-sm bg-white">
+                    <p id="error-phone" class="text-error text-sm hidden">กรุณากรอกข้อมูล</p>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="font-medium text-gray-700">จำนวนคน :</label>
+                    <div class="flex gap-3" id="pax-container">
+                        <button onclick="selectPax(1)" class="pax-btn w-12 h-12 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition" data-value="1">1</button>
+                        <button onclick="selectPax(2)" class="pax-btn w-12 h-12 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition" data-value="2">2</button>
+                        <button onclick="selectPax(3)" class="pax-btn w-12 h-12 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition" data-value="3">3</button>
+                        <button onclick="selectPax(4)" class="pax-btn w-12 h-12 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition" data-value="4">4</button>
+                    </div>
+                    <input type="hidden" id="pax-value" value="">
+                    <p id="error-pax" class="text-error text-sm hidden">กรุณากรอกข้อมูล</p>
+                </div>
+
+                <div class="flex flex-col gap-1 relative">
+                    <label class="font-medium text-gray-700">เวลา :</label>
+                    <div id="time-trigger" onclick="toggleTimeDropdown(event)" 
+                         class="w-full border border-gray-200 rounded-lg p-3 text-gray-400 bg-white cursor-pointer flex justify-between items-center shadow-sm hover:border-gray-300">
+                        <span id="time-display">เลือกเวลา</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                        </svg>
+                    </div>
+                    <div id="time-options" class="hidden absolute top-[80px] left-0 w-full bg-[#F3F3F3] border border-gray-200 rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto no-scrollbar"></div>
+                    <input type="hidden" id="time-value" value="">
+                    <p id="error-time" class="text-error text-sm hidden">กรุณากรอกข้อมูล</p>
+                </div>
+
+                <div class="flex justify-center gap-4 mt-8 pt-4">
+                    <button onclick="resetForm()" class="px-8 py-3 bg-secondary text-white font-medium rounded-lg hover:bg-gray-400 transition shadow-sm min-w-[120px]">ยกเลิก</button>
+                    <button id="submit-btn" onclick="submitBooking()" 
+                        class="px-8 py-3 bg-primaryLight text-white font-medium rounded-lg hover:bg-red-300 transition shadow-sm min-w-[120px]">
+                        ยืนยันการจอง
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="success-section" class="hidden flex flex-col items-center">
+            <h1 class="text-3xl font-bold text-center mb-2">COCO Mala Booking</h1>
+            <h2 class="text-xl font-bold text-center mb-6 text-gray-700">รายละเอียด</h2>
+
+            <div class="w-full bg-card rounded-xl p-6 mb-6 shadow-sm relative">
+                <div class="absolute top-6 right-6 text-gray-600 text-sm font-medium" id="summary-date"></div>
+                <div class="space-y-2 text-gray-800">
+                    <p>ชื่อผู้จอง : <span id="summary-name" class="font-medium"></span></p>
+                    <p>เบอร์ : <span id="summary-phone" class="font-medium"></span></p>
+                    <p>รหัสคิว : <span id="summary-queue" class="text-[#EE3F3E] font-bold"></span></p>
+                    <p>ลำดับโต๊ะ : <span id="summary-table" class="font-medium"></span></p>
+                    <p>เวลา : <span id="summary-time" class="font-medium"></span></p>
+                </div>
+                <div class="mt-8 text-center text-sm font-medium text-gray-800">
+                    ลูกค้าสามารถใช้เบอร์โทรเพื่อยืนยันการจองกับทางร้าน
+                </div>
+            </div>
+
+            <p class="text-error text-center text-sm font-medium mb-8">
+                "หมายเหตุ: กรุณายืนยันตัวตนภายใน 5 นาทีหลังถึงเวลานัด มิฉะนั้นระบบจะทำการยกเลิกคิวโดยอัตโนมัติ"
+            </p>
+
+            <div class="flex flex-col items-center gap-4 w-full">
+                <button onclick="goToHome()" class="w-48 py-3 bg-[#FF5C35] text-white font-bold text-lg rounded-xl hover:bg-red-600 transition shadow-md">กลับสู่หน้าหลัก</button>
+                <button onclick="openCancelModal()" class="text-gray-500 font-medium border-b border-gray-400 pb-0.5 hover:text-gray-800 transition">ยกเลิกการจอง</button>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="cancel-modal" class="hidden fixed inset-0 bg-black bg-opacity-30 z-[100] flex items-center justify-center px-4">
+        <div class="bg-white rounded-2xl shadow-xl p-8 w-full max-w-sm text-center">
+            <h3 class="text-xl font-bold text-error mb-8">คุณต้องการยกเลิกการจอง<br>หรือไม่</h3>
+            <div class="flex justify-center gap-4">
+                <button onclick="confirmCancel()" class="px-6 py-2 bg-[#EE3F3E] text-white rounded-lg font-medium hover:bg-red-700 min-w-[100px]">ยกเลิก</button>
+                <button onclick="closeCancelModal()" class="px-6 py-2 bg-gray-300 text-white rounded-lg font-medium hover:bg-gray-400 min-w-[100px]">ตกลง</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // *******************************************************
+        // ใส่ URL ที่ได้จาก Google Apps Script ตรงนี้ครับ
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwtEUI8YZr_nWHZNI_QD-qMHQz_Wp_EaGYMAUiIDP1hDHD4ID3ksQN5Q6LiwVN0bStW/exec'; 
+        // *******************************************************
+
+        let currentPax = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            generateTimeOptions();
+        });
+
+        function checkFormCompletion() {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const pax = document.getElementById('pax-value').value;
+            const time = document.getElementById('time-value').value;
+            const btn = document.getElementById('submit-btn');
+
+            if (name && phone.length >= 9 && pax && time) {
+                btn.classList.remove('bg-primaryLight', 'hover:bg-red-300');
+                btn.classList.add('bg-[#EE3F3E]', 'hover:bg-red-400');
+            } else {
+                btn.classList.add('bg-primaryLight', 'hover:bg-red-300');
+                btn.classList.remove('bg-[#EE3F3E]', 'hover:bg-red-400');
+            }
+        }
+
+        function validatePhone(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        function showError(fieldId) {
+            document.getElementById(`error-${fieldId}`).classList.remove('hidden');
+            if (fieldId === 'time') {
+                document.getElementById('time-trigger').classList.add('border-error');
+                document.getElementById('time-trigger').classList.remove('border-gray-200');
+            } else if (fieldId !== 'pax') {
+                document.getElementById(fieldId).classList.add('border-error');
+                document.getElementById(fieldId).classList.remove('border-gray-200');
+            }
+        }
+
+        function clearError(fieldId) {
+            document.getElementById(`error-${fieldId}`).classList.add('hidden');
+            if (fieldId === 'time') {
+                document.getElementById('time-trigger').classList.remove('border-error');
+                document.getElementById('time-trigger').classList.add('border-gray-200');
+            } else if (fieldId !== 'pax') {
+                document.getElementById(fieldId).classList.remove('border-error');
+                document.getElementById(fieldId).classList.add('border-gray-200');
+            }
+        }
+
+        function generateTimeOptions() {
+            const container = document.getElementById('time-options');
+            let html = '';
+            for (let i = 11; i <= 21; i++) {
+                const timeText = `${i}:00 น.`;
+                html += `<div onclick="selectTime('${timeText}')" 
+                            class="p-3 text-center border-b border-gray-200 cursor-pointer hover:bg-gray-200 text-gray-700 last:border-b-0 transition">
+                            ${timeText}
+                         </div>`;
+            }
+            container.innerHTML = html;
+        }
+
+        function toggleTimeDropdown(e) {
+            e.stopPropagation();
+            const dropdown = document.getElementById('time-options');
+            dropdown.classList.toggle('hidden');
+        }
+
+        function selectTime(time) {
+            document.getElementById('time-display').innerText = time;
+            document.getElementById('time-display').classList.remove('text-gray-400');
+            document.getElementById('time-display').classList.add('text-gray-800');
+            document.getElementById('time-value').value = time;
+            document.getElementById('time-options').classList.add('hidden');
+            clearError('time');
+            checkFormCompletion();
+        }
+
+        function closeDropdown(e) {
+            const dropdown = document.getElementById('time-options');
+            const trigger = document.getElementById('time-trigger');
+            if (!trigger.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        }
+
+        function selectPax(number) {
+            currentPax = number;
+            document.getElementById('pax-value').value = number;
+            
+            const buttons = document.querySelectorAll('.pax-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-gray-400', 'text-white', 'border-gray-400');
+                btn.classList.add('border-gray-200', 'text-gray-800');
+            });
+            const activeBtn = document.querySelector(`.pax-btn[data-value="${number}"]`);
+            if(activeBtn) {
+                activeBtn.classList.remove('border-gray-200', 'text-gray-800');
+                activeBtn.classList.add('bg-gray-400', 'text-white', 'border-gray-400');
+            }
+            clearError('pax');
+            checkFormCompletion();
+        }
+
+        function submitBooking() {
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const pax = document.getElementById('pax-value').value;
+            const time = document.getElementById('time-value').value;
+            const btn = document.getElementById('submit-btn');
+            
+            let isValid = true;
+            if (!name) { showError('name'); isValid = false; }
+            if (!phone) { showError('phone'); isValid = false; }
+            else if (phone.length < 9) { 
+                showError('phone');
+                alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง');
+                isValid = false; 
+            }
+            if (!pax) { showError('pax'); isValid = false; }
+            if (!time) { showError('time'); isValid = false; }
+
+            if (!isValid) return;
+
+            // 1. สร้างข้อมูลสุ่ม (Queue & Table)
+            const randomQueue = '#' + Math.floor(1000 + Math.random() * 9000);
+            const randomTable = Math.floor(Math.random() * 20) + 1;
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+            // 2. เปลี่ยนสถานะปุ่ม (Loading)
+            const originalText = btn.innerText;
+            btn.innerText = 'กำลังบันทึก...';
+            btn.disabled = true;
+            btn.classList.add('opacity-70', 'cursor-not-allowed');
+
+            // 3. เตรียมข้อมูลส่ง Google Sheet
+            const formData = {
+                action: 'save',
+                name: name,
+                phone: phone,
+                pax: pax,
+                time: time,
+                queue: randomQueue,
+                table: randomTable
+            };
+
+            // 4. ส่งข้อมูลด้วย Fetch
+            fetch(scriptURL, {
+                method: 'POST',
+                body: JSON.stringify(formData),
+                mode: 'no-cors' // ใช้ no-cors เพื่อให้ส่งไป Google Script ได้ง่าย
+            })
+            .then(() => {
+                // ส่งสำเร็จ -> แสดงหน้า Success
+                document.getElementById('summary-name').innerText = name;
+                document.getElementById('summary-phone').innerText = formatPhoneNumber(phone);
+                document.getElementById('summary-queue').innerText = randomQueue;
+                document.getElementById('summary-table').innerText = randomTable;
+                document.getElementById('summary-time').innerText = time;
+                document.getElementById('summary-date').innerText = dateStr;
+
+                document.getElementById('booking-section').classList.add('hidden');
+                document.getElementById('success-section').classList.remove('hidden');
+                window.scrollTo(0,0);
+            })
+            .catch(error => {
+                console.error('Error!', error.message);
+                alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                // คืนค่าปุ่ม
+                btn.innerText = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-70', 'cursor-not-allowed');
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('name').value = '';
+            document.getElementById('phone').value = '';
+            document.getElementById('pax-value').value = '';
+            document.getElementById('time-value').value = '';
+            document.getElementById('time-display').innerText = 'เลือกเวลา';
+            document.getElementById('time-display').classList.add('text-gray-400');
+            document.getElementById('time-display').classList.remove('text-gray-800');
+
+            currentPax = null;
+            document.querySelectorAll('.pax-btn').forEach(btn => {
+                btn.classList.remove('bg-gray-400', 'text-white', 'border-gray-400');
+                btn.classList.add('border-gray-200', 'text-gray-800');
+            });
+            ['name', 'phone', 'pax', 'time'].forEach(id => clearError(id));
+            checkFormCompletion();
+        }
+
+        function formatPhoneNumber(phoneNumberString) {
+            var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
+            var match = cleaned.match(/^(\d{3})(\d{3,4})(\d{3,4})$/);
+            if (match) {
+                return match[1] + '-' + match[2] + match[3];
+            }
+            return phoneNumberString;
+        }
+
+        function openCancelModal() {
+            document.getElementById('cancel-modal').classList.remove('hidden');
+        }
+
+        function closeCancelModal() {
+            document.getElementById('cancel-modal').classList.add('hidden');
+        }
+
+        function confirmCancel() {
+            document.getElementById('cancel-modal').classList.add('hidden');
+            document.getElementById('success-section').classList.add('hidden');
+            document.getElementById('booking-section').classList.remove('hidden');
+            resetForm();
+            window.scrollTo(0,0);
+        }
+
+        function goToHome() {
+            location.reload(); 
+        }
+    </script>
+</body>
+</html>
