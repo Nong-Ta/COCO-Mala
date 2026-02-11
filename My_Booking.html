@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เลือกรายการจอง - COCO Mala</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white text-gray-800 font-sans">
+
+    <nav class="border-b border-gray-200 py-4 px-6 flex justify-between items-center bg-white sticky top-0 z-50">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='Booking.html'">
+            <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm flex-shrink-0">
+                <img src="Logo-COCO/COCO Mala.jpg" alt="Logo" class="w-full h-full object-cover">
+            </div>
+            <span class="font-bold text-lg tracking-wide">COCO Mala Booking</span>
+        </div>
+        <ul class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
+            <li class="cursor-pointer hover:text-black" onclick="window.location.href='Booking.html'">หน้าหลัก</li>
+            <li class="cursor-pointer text-black font-bold border-b-2 border-red-500">คิวของคุณ</li>
+            <li class="cursor-pointer text-red-500 hover:text-red-700 font-bold" onclick="window.location.href='Booking.html'">จองคิวใหม่</li>
+        </ul>
+    </nav>
+
+    <main class="max-w-2xl mx-auto mt-20 px-4 flex flex-col items-center">
+        <h1 class="text-3xl font-bold text-center mb-12">การจองคิวของฉัน</h1>
+
+        <div class="w-full space-y-6">
+            <a href="active_booking.html" class="block w-full">
+                <button class="w-full bg-[#C93030] text-white text-xl font-bold py-6 rounded-xl shadow-md hover:bg-red-800 transition transform hover:scale-[1.02]">
+                    การจองคิวของฉัน
+                </button>
+            </a>
+
+            <a href="history_booking.html" class="block w-full">
+                <button class="w-full bg-[#C93030] text-white text-xl font-bold py-6 rounded-xl shadow-md hover:bg-red-800 transition transform hover:scale-[1.02]">
+                    ประวัติการจองคิว
+                </button>
+            </a>
+        </div>
+    </main>
+
+</body>
+</html>

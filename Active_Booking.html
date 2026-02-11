@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>คิวปัจจุบัน - COCO Mala</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white text-gray-800 font-sans">
+
+    <nav class="border-b border-gray-200 py-4 px-6 flex justify-between items-center bg-white sticky top-0 z-50">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='Booking.html'">
+            <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm flex-shrink-0">
+                <img src="Logo-COCO/COCO Mala.jpg" alt="Logo" class="w-full h-full object-cover">
+            </div>
+            <span class="font-bold text-lg tracking-wide">COCO Mala Booking</span>
+        </div>
+        <ul class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
+            <li class="cursor-pointer hover:text-black" onclick="window.location.href='Booking.html'">หน้าหลัก</li>
+            <li class="cursor-pointer text-black font-bold border-b-2 border-red-500" onclick="window.location.href='my_booking.html'">คิวของคุณ</li>
+        </ul>
+    </nav>
+
+    <main class="max-w-5xl mx-auto mt-16 px-4">
+        <h1 class="text-3xl font-bold text-center mb-12">การจองคิวของฉัน</h1>
+
+        <div id="active-booking-container" class="space-y-6">
+            </div>
+
+        <div id="no-booking-msg" class="hidden flex flex-col items-center justify-center mt-20 text-gray-400">
+            <p class="text-xl mb-4">ไม่มีรายการจองคิวในขณะนี้</p>
+            <button onclick="window.location.href='Booking.html'" class="text-[#EE3F3E] underline hover:text-red-700">จองคิวเลย</button>
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderActiveBookings();
+        });
+
+        function getLocalBookings() {
+            const stored = localStorage.getItem('coco_bookings');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function maskPhoneNumber(phone) {
+            if (!phone || phone.length < 10) return phone;
+            return phone.substring(0, 3) + '-XXXXXXX'; 
+        }
+
+        function renderActiveBookings() {
+            const bookings = getLocalBookings();
+            const container = document.getElementById('active-booking-container');
+            const noMsg = document.getElementById('no-booking-msg');
+
+            container.innerHTML = ''; 
+
+            // กรองเอาเฉพาะสถานะ 'active' (หรือไม่มีสถานะก็ถือว่า active)
+            const activeBookings = bookings.filter(b => b.status === 'active' || !b.status);
+
+            if (activeBookings.length === 0) {
+                noMsg.classList.remove('hidden');
+                return;
+            } else {
+                noMsg.classList.add('hidden');
+            }
+
+            // วนลูปแสดงผล (เรียงจากหลังมาหน้า)
+            activeBookings.slice().reverse().forEach((booking) => {
+                // ต้องหา index จริงใน array หลัก เพื่อส่งไปแก้ไข
+                const realIndex = bookings.indexOf(booking);
+                
+                const displayDate = booking.date ? booking.date : new Date().toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
+
+                const card = document.createElement('div');
+                card.className = 'w-full bg-[#FFF0F0] rounded-2xl p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm';
+                
+                card.innerHTML = `
+                    <div class="space-y-1 text-gray-800 font-medium text-lg w-full md:w-auto">
+                        <p>ชื่อผู้จอง : <span class="font-normal text-gray-600">${booking.name}</span></p>
+                        <p>เบอร์ : <span class="font-normal text-gray-600">${maskPhoneNumber(booking.phone)}</span></p>
+                        <p>รหัสคิว : <span class="text-[#EE3F3E] font-bold">${booking.queue}</span></p>
+                        <p>ลำดับโต๊ะ : <span class="font-normal text-gray-600">${booking.table}</span></p>
+                        <p>เวลา : <span class="font-normal text-gray-600">${booking.time}</span></p>
+                    </div>
+
+                    <div class="flex flex-row md:flex-row items-center justify-between w-full md:w-auto gap-8 md:gap-12 mt-4 md:mt-0">
+                        <span class="text-gray-800 font-medium text-lg">${displayDate}</span>
+                        
+                        <button onclick="cancelBooking(${realIndex})" 
+                            class="px-6 py-3 bg-[#EE3F3E] text-white text-base font-bold rounded-lg hover:bg-red-700 transition shadow-md whitespace-nowrap">
+                            ยกเลิกการจอง
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function cancelBooking(index) {
+            if(confirm('คุณต้องการยกเลิกการจองคิวนี้ใช่หรือไม่?')) {
+                const bookings = getLocalBookings();
+                
+                // *** จุดเปลี่ยนสำคัญ: ไม่ลบ (splice) แต่เปลี่ยนสถานะเป็น cancelled ***
+                if(bookings[index]) {
+                    bookings[index].status = 'cancelled';
+                    localStorage.setItem('coco_bookings', JSON.stringify(bookings));
+                    renderActiveBookings(); // รีเฟรชหน้า
+                }
+            }
+        }
+    </script>
+</body>
+</html>

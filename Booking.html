@@ -44,7 +44,10 @@
         <ul class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
             <li class="cursor-pointer hover:text-black" onclick="goToHome()">หน้าหลัก</li>
             <li class="cursor-pointer hover:text-black"><a href="https://maps.app.goo.gl/69h3AdeuP8SHrQj68" target="_blank">แผนที่</a></li>
-            <li class="cursor-pointer hover:text-black">คิวของคุณ</li>
+            <ul class="hidden md:flex gap-8 ...">
+                <li class="cursor-pointer hover:text-black">
+                    <a href="my_booking.html">คิวของคุณ</a></li>
+            </ul>
             <li class="cursor-pointer text-red-500 hover:text-red-700 font-bold" onclick="resetSystem()">ออกจากระบบ</li>
         </ul>
     </nav>
@@ -65,7 +68,7 @@
 
                 <div class="flex flex-col gap-1">
                     <label for="phone" class="font-medium text-gray-700">เบอร์ :</label>
-                    <input type="tel" id="phone" placeholder="กรอกเบอร์" mlength="10" maxlength="10"
+                    <input type="tel" id="phone" placeholder="กรอกเบอร์โทรศัพท์ (10 หลัก)" maxlength="10"
                         oninput="validatePhone(this); checkFormCompletion(); clearError('phone')"
                         class="w-full border border-gray-200 rounded-lg p-3 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-primary transition shadow-sm bg-white">
                     <p id="error-phone" class="text-error text-sm hidden">กรุณากรอกข้อมูล</p>
@@ -174,7 +177,8 @@
             const time = document.getElementById('time-value').value;
             const btn = document.getElementById('submit-btn');
 
-            if (name && phone.length >= 9 && pax && time) {
+            // แก้ไข 2: เปลี่ยน phone.length >= 9 เป็น phone.length === 10
+            if (name && phone.length === 10 && pax && time) {
                 btn.classList.remove('bg-primaryLight', 'hover:bg-red-300');
                 btn.classList.add('bg-[#EE3F3E]', 'hover:bg-red-400');
             } else {
@@ -274,9 +278,10 @@
             let isValid = true;
             if (!name) { showError('name'); isValid = false; }
             if (!phone) { showError('phone'); isValid = false; }
-            else if (phone.length < 9) { 
+            // แก้ไข 3: เปลี่ยน < 9 เป็น !== 10
+            else if (phone.length !== 10) { 
                 showError('phone');
-                alert('กรุณากรอกเบอร์โทรศัพท์ให้ถูกต้อง');
+                alert('กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก');
                 isValid = false; 
             }
             if (!pax) { showError('pax'); isValid = false; }
@@ -313,7 +318,9 @@
                 pax: pax,
                 time: time,
                 queue: randomQueue,
-                table: assignedTable
+                table: assignedTable,
+                date: dateStr,
+                status: 'active'
             };
 
             // บันทึกลง LocalStorage
@@ -415,12 +422,18 @@
             return stored ? JSON.parse(stored) : [];
         }
 
+        // แก้ไขฟังก์ชันนี้ในไฟล์ index.html
         function findLowestAvailableTable() {
             const bookings = getLocalBookings();
-            const takenTables = bookings.map(b => parseInt(b.table));
+            
+            // *** แก้ไข: นับเฉพาะคนที่สถานะเป็น 'active' เท่านั้น ***
+            // (คนที่เป็น cancelled, completed, expired จะไม่ถูกนับว่าครองโต๊ะอยู่)
+            const takenTables = bookings
+                .filter(b => b.status === 'active') 
+                .map(b => parseInt(b.table));
 
-            // *** แก้ไขตรงนี้: เริ่มจาก 1 ถึง 10 ***
-            for (let i = 8; i <= MAX_TABLES; i++) {
+            // เช็คโต๊ะ 1 ถึง 10
+            for (let i = 1; i <= MAX_TABLES; i++) {
                 if (!takenTables.includes(i)) {
                     return i; 
                 }

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติการจองคิว - COCO Mala</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-white text-gray-800 font-sans">
+
+    <nav class="border-b border-gray-200 py-4 px-6 flex justify-between items-center bg-white sticky top-0 z-50">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='Booking.html'">
+            <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm flex-shrink-0">
+                <img src="Logo-COCO/COCO Mala.jpg" alt="Logo" class="w-full h-full object-cover">
+            </div>
+            <span class="font-bold text-lg tracking-wide">COCO Mala Booking</span>
+        </div>
+        <ul class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
+            <li class="cursor-pointer hover:text-black" onclick="window.location.href='Booking.html'">หน้าหลัก</li>
+            <li class="cursor-pointer text-black font-bold border-b-2 border-red-500" onclick="window.location.href='my_booking.html'">คิวของคุณ</li>
+        </ul>
+    </nav>
+
+    <main class="max-w-4xl mx-auto mt-12 px-4 pb-20">
+        <h1 class="text-3xl font-bold text-center mb-10">ประวัติการจองคิว</h1>
+
+        <div id="history-container" class="space-y-6"></div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHistory();
+        });
+
+        function renderHistory() {
+            // ดึงข้อมูลจริงจาก LocalStorage
+            const stored = localStorage.getItem('coco_bookings');
+            const bookings = stored ? JSON.parse(stored) : [];
+            
+            const container = document.querySelector('.space-y-6'); // หรือใส่ id="history-container" ที่ div หลักก็ได้
+            
+            // ถ้ายังไม่มี id ให้ใส่ id="history-container" ที่ div class="space-y-6" ก่อนนะครับ
+            // เพื่อความชัวร์ ผมจะใช้ getElementById ถ้าคุณแก้ HTML แล้ว
+            // ถ้ายังไม่แก้ ให้ใช้ logic นี้:
+            if(bookings.length === 0) {
+                container.innerHTML = '<p class="text-center text-gray-400 mt-10">ไม่มีประวัติการจอง</p>';
+                return;
+            }
+
+            container.innerHTML = ''; // ล้างข้อมูลตัวอย่าง (Hardcode) ออก
+
+            // วนลูปสร้างประวัติ (ล่าสุดขึ้นก่อน)
+            bookings.slice().reverse().forEach(booking => {
+                const status = booking.status || 'active'; // ถ้าไม่มีสถานะ ถือว่า Active
+                let statusColor = '';
+                let statusText = '';
+                
+                // กำหนดสีและข้อความตามสถานะ
+                if (status === 'active') {
+                    statusColor = 'bg-[#28a745]'; // สีเขียว (รอเรียก)
+                    statusText = 'กำลังดำเนินการ';
+                } else if (status === 'cancelled') {
+                    statusColor = 'bg-[#EE3F3E]'; // สีแดง
+                    statusText = 'ถูกยกเลิกแล้ว';
+                } else if (status === 'completed') {
+                    statusColor = 'bg-[#008CC9]'; // สีฟ้า
+                    statusText = 'เสร็จแล้ว';
+                }
+
+                const displayDate = booking.date ? booking.date : '-';
+
+                // สร้าง HTML
+                const card = document.createElement('div');
+                card.className = 'flex rounded-xl overflow-hidden shadow-sm h-auto min-h-[180px] bg-white';
+                
+                card.innerHTML = `
+                    <div class="flex-1 bg-[#FFF0F0] p-6 flex flex-col justify-center relative border-r-2 border-dashed border-gray-400">
+                        <p class="font-bold">ชื่อผู้จอง : <span class="font-normal">${booking.name}</span></p>
+                        <p class="font-bold">เบอร์ : <span class="font-normal">${booking.phone.substring(0,3)}-XXXXXXX</span></p>
+                        <p class="font-bold">รหัสคิว : <span class="text-[#EE3F3E]">${booking.queue}</span></p>
+                        <p class="font-bold">ลำดับโต๊ะ : <span class="font-normal">${booking.table}</span></p>
+                        <p class="font-bold">เวลา : <span class="font-normal">${booking.time}</span></p>
+                        <div class="absolute top-6 right-6 text-gray-600 font-medium">${displayDate}</div>
+                    </div>
+                    <div class="w-32 md:w-48 ${statusColor} flex items-center justify-center text-white font-bold text-xl md:text-2xl text-center px-2">
+                        ${statusText}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+    </script>
+
+</body>
+</html>
