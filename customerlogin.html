@@ -1,11 +1,215 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>customerlogin-page</title>
-</head>
-<body>
     
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700&family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Prompt', sans-serif; }
+        .font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col relative text-gray-900">
+
+    <nav class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+        <div class="flex items-center gap-3">
+            <div class="w-6 h-6 bg-black relative flex items-center justify-center rounded-[2px]">
+                 <div class="absolute top-0 right-0 w-3 h-3 bg-white"></div>
+            </div>
+            
+            <span class="font-jakarta font-bold text-lg tracking-wide">
+                COCO Mala Booking
+            </span>
+        </div>
+        
+        <a href="https://www.google.co.th/maps/place/Coco+Ma+La+tang..." 
+           target="_blank"
+           class="text-sm text-gray-600 hover:text-black font-medium transition-colors">
+           แผนที่
+        </a>
+    </nav>
+
+    <main class="flex-grow flex flex-col items-center pt-24 px-4 w-full">
+        
+        <h1 class="text-[48px] font-medium mb-12">เข้าสู่ระบบ</h1>
+
+        <div class="w-full max-w-[420px] space-y-6">
+            
+            <div class="space-y-2">
+                <label class="block text-gray-700 text-sm pl-1">เบอร์ :</label>
+                <input type="tel" 
+                       id="phoneInput"
+                       maxlength="10"
+                       inputmode="numeric"
+                       placeholder="กรอกเบอร์" 
+                       class="w-full border border-gray-200 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:border-red-300 focus:ring-1 focus:ring-red-300 placeholder-gray-300 transition-all">
+                <p id="phoneError" class="hidden text-red-500 text-xs mt-1 pl-1">
+                    ข้อมูลไม่ถูกต้อง
+                </p>
+            </div>
+
+            <div class="space-y-2">
+                <label class="block text-gray-700 text-sm pl-1">OTP :</label>
+                <div class="flex gap-3 items-start">
+                    <div class="w-full">
+                        <input type="text" 
+                               id="otpInput"
+                               maxlength="6"
+                               inputmode="numeric"
+                               autocomplete="off"
+                               placeholder="กรอก OTP ของคุณ" 
+                               class="w-full border border-gray-200 rounded-lg px-4 py-3 text-gray-700 focus:outline-none focus:border-red-300 focus:ring-1 focus:ring-red-300 placeholder-gray-300 transition-all">
+                        <p id="otpError" class="hidden text-red-500 text-xs mt-1 pl-1">
+                            ข้อมูลไม่ถูกต้อง
+                        </p>
+                    </div>
+                    <button id="otpBtn"
+                            disabled
+                            class="bg-[#9CA3AF] text-white cursor-not-allowed text-sm px-4 rounded-lg min-w-[120px] h-[50px] flex flex-col items-center justify-center transition-colors shadow-sm gap-1">
+                        <span>ส่งรหัส OTP</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="pt-8 flex justify-center">
+                <button id="loginBtn" 
+                        disabled
+                        class="bg-[#FC938A] text-white cursor-not-allowed text-base font-medium py-2.5 px-10 rounded-lg shadow-md transition-all duration-300">
+                    เข้าสู่ระบบ
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <div class="absolute bottom-4 right-6 md:bottom-6 md:right-8">
+        <a href="adminlogin.html" class="text-xs text-gray-300 hover:text-gray-400 transition-colors font-light">
+            เข้าสู่ระบบสำหรับ Admin
+        </a>
+    </div>
+
+    <script>
+        const phoneInput = document.getElementById('phoneInput');
+        const phoneError = document.getElementById('phoneError');
+        const otpInput = document.getElementById('otpInput');
+        const otpError = document.getElementById('otpError');
+        const otpBtn = document.getElementById('otpBtn');
+        const loginBtn = document.getElementById('loginBtn');
+
+        let isTimerRunning = false;
+
+        function checkInputs() {
+            const phoneValue = phoneInput.value;
+            const otpValue = otpInput.value;
+
+            const hasPhoneInvalidChars = /\D/.test(phoneValue);
+            const isPhoneTenDigits = phoneValue.length === 10;
+            const isPhoneValid = !hasPhoneInvalidChars && isPhoneTenDigits;
+
+            if (hasPhoneInvalidChars) {
+                phoneError.classList.remove('hidden');
+                setErrorStyle(phoneInput, true);
+            } else {
+                phoneError.classList.add('hidden');
+                setErrorStyle(phoneInput, false);
+            }
+
+            const hasOtpInvalidChars = /\D/.test(otpValue);
+            const isOtpSixDigits = otpValue.length === 6;
+            const isOtpValid = !hasOtpInvalidChars && isOtpSixDigits;
+
+            if (hasOtpInvalidChars && otpValue.length > 0) {
+                otpError.classList.remove('hidden');
+                setErrorStyle(otpInput, true);
+            } else {
+                otpError.classList.add('hidden');
+                setErrorStyle(otpInput, false);
+            }
+
+            if (!isTimerRunning) {
+                if (isPhoneValid) {
+                    otpBtn.removeAttribute('disabled');
+                    otpBtn.classList.remove('bg-[#9CA3AF]', 'cursor-not-allowed');
+                    otpBtn.classList.add('bg-gray-600', 'hover:bg-gray-800', 'cursor-pointer');
+                } else {
+                    otpBtn.setAttribute('disabled', 'true');
+                    otpBtn.classList.add('bg-[#9CA3AF]', 'cursor-not-allowed');
+                    otpBtn.classList.remove('bg-gray-600', 'hover:bg-gray-800', 'cursor-pointer');
+                }
+            }
+
+            if (isPhoneValid && isOtpValid) {
+                loginBtn.removeAttribute('disabled');
+                loginBtn.classList.remove('bg-[#FC938A]', 'cursor-not-allowed');
+                loginBtn.classList.add('bg-[#ED3B2B]', 'hover:bg-red-600', 'cursor-pointer', 'active:scale-95');
+            } else {
+                loginBtn.setAttribute('disabled', 'true');
+                loginBtn.classList.add('bg-[#FC938A]', 'cursor-not-allowed');
+                loginBtn.classList.remove('bg-[#ED3B2B]', 'hover:bg-red-600', 'cursor-pointer', 'active:scale-95');
+            }
+        }
+
+        function setErrorStyle(element, isError) {
+            if (isError) {
+                element.classList.add('border-red-500', 'text-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                element.classList.remove('border-gray-200', 'text-gray-700', 'focus:border-red-300', 'focus:ring-red-300');
+            } else {
+                element.classList.remove('border-red-500', 'text-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+                element.classList.add('border-gray-200', 'text-gray-700', 'focus:border-red-300', 'focus:ring-red-300');
+            }
+        }
+
+        phoneInput.addEventListener('input', checkInputs);
+        otpInput.addEventListener('input', checkInputs);
+
+        otpBtn.addEventListener('click', function() {
+            if (otpBtn.hasAttribute('disabled')) return;
+            alert('ส่ง OTP ไปยัง: ' + phoneInput.value);
+            startCountdown();
+        });
+
+        function startCountdown() {
+            isTimerRunning = true; 
+            let timeLeft = 30;
+            otpBtn.setAttribute('disabled', 'true');
+            otpBtn.classList.add('bg-[#9CA3AF]', 'cursor-not-allowed');
+            otpBtn.classList.remove('bg-gray-600', 'hover:bg-gray-800', 'cursor-pointer');
+            otpBtn.innerHTML = `<span class="text-sm">ส่งรหัสอีกครั้ง (${timeLeft}s)</span>`;
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    otpBtn.innerHTML = `<span class="text-sm">ส่งรหัสอีกครั้ง (${timeLeft}s)</span>`;
+                } else {
+                    clearInterval(timer);
+                    isTimerRunning = false;
+                    checkInputs(); 
+                    otpBtn.innerHTML = `<span class="text-xs">ส่งรหัสใหม่</span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>`;
+                }
+            }, 1000);
+        }
+
+        loginBtn.addEventListener('click', function() {
+            if (!loginBtn.hasAttribute('disabled')) {
+                window.location.href = 'dashboard.html'; 
+            }
+        });
+
+        // ล้างค่าเมื่อเข้าสู่หน้าจอ (รีเฟรช/ย้อนกลับ)
+        window.addEventListener('pageshow', () => {
+            localStorage.clear();
+            phoneInput.value = '';
+            otpInput.value = '';
+            checkInputs();
+        });
+
+    </script>
 </body>
 </html>
