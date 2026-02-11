@@ -42,10 +42,10 @@
             <span class="font-bold text-lg tracking-wide">COCO Mala Booking</span>
         </div>
         <ul class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
-            <li class="cursor-pointer hover:text-black">หน้าหลัก</li>
+            <li class="cursor-pointer hover:text-black" onclick="goToHome()">หน้าหลัก</li>
             <li class="cursor-pointer hover:text-black"><a href="https://maps.app.goo.gl/69h3AdeuP8SHrQj68" target="_blank">แผนที่</a></li>
             <li class="cursor-pointer hover:text-black">คิวของคุณ</li>
-            <li class="cursor-pointer hover:text-black">ออกจากระบบ</li>
+            <li class="cursor-pointer text-red-500 hover:text-red-700 font-bold" onclick="resetSystem()">ออกจากระบบ</li>
         </ul>
     </nav>
 
@@ -105,6 +105,14 @@
                     </button>
                 </div>
             </div>
+        </div>
+
+        <div id="full-section" class="hidden flex flex-col items-center justify-center min-h-[50vh] text-center">
+            <h1 class="text-5xl font-bold text-[#FF3B30] mb-8">ขออภัย</h1>
+            <p id="full-time-display" class="text-2xl font-bold text-gray-800 mb-4">เวลา XX:XX น.</p>
+            <p class="text-2xl font-bold text-gray-800 mb-10">ในขณะนี้ไม่มีโต๊ะว่าง</p>
+            <button onclick="goToHome()" 
+            class="px-8 py-3 bg-[#EE3F3E] text-white font-bold text-xl rounded-xl hover:bg-red-600 transition shadow-md w-full max-w-xs">กลับสู่หน้าหลัก</button>
         </div>
 
         <div id="success-section" class="hidden flex flex-col items-center">
@@ -276,19 +284,28 @@
 
             if (!isValid) return;
 
-            // 1. สร้างข้อมูลสุ่ม (Queue & Table)
+            // 1. หาโต๊ะว่าง
+            const assignedTable = findLowestAvailableTable();
+
+            // 2. เช็คว่าโต๊ะเต็มหรือไม่
+            if (assignedTable === null) {
+                document.getElementById('full-time-display').innerText = 'เวลา ' + time;
+                document.getElementById('booking-section').classList.add('hidden');
+                document.getElementById('full-section').classList.remove('hidden');
+                window.scrollTo(0,0);
+                return; 
+            }
+
+            // 3. สร้างเลขคิว
             const randomQueue = '#' + Math.floor(1000 + Math.random() * 9000);
-            const randomTable = Math.floor(Math.random() * 20) + 1;
             const today = new Date();
             const dateStr = today.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
 
-            // 2. เปลี่ยนสถานะปุ่ม (Loading)
             const originalText = btn.innerText;
             btn.innerText = 'กำลังบันทึก...';
             btn.disabled = true;
             btn.classList.add('opacity-70', 'cursor-not-allowed');
 
-            // 3. เตรียมข้อมูลส่ง Google Sheet
             const formData = {
                 action: 'save',
                 name: name,
@@ -296,21 +313,25 @@
                 pax: pax,
                 time: time,
                 queue: randomQueue,
-                table: randomTable
+                table: assignedTable
             };
 
-            // 4. ส่งข้อมูลด้วย Fetch
+            // บันทึกลง LocalStorage
+            const currentBookings = getLocalBookings();
+            currentBookings.push(formData);
+            localStorage.setItem('coco_bookings', JSON.stringify(currentBookings));
+
+            // ส่ง Google Sheet
             fetch(scriptURL, {
                 method: 'POST',
                 body: JSON.stringify(formData),
-                mode: 'no-cors' // ใช้ no-cors เพื่อให้ส่งไป Google Script ได้ง่าย
+                mode: 'no-cors' 
             })
             .then(() => {
-                // ส่งสำเร็จ -> แสดงหน้า Success
                 document.getElementById('summary-name').innerText = name;
                 document.getElementById('summary-phone').innerText = formatPhoneNumber(phone);
                 document.getElementById('summary-queue').innerText = randomQueue;
-                document.getElementById('summary-table').innerText = randomTable;
+                document.getElementById('summary-table').innerText = assignedTable;
                 document.getElementById('summary-time').innerText = time;
                 document.getElementById('summary-date').innerText = dateStr;
 
@@ -321,7 +342,6 @@
             .catch(error => {
                 console.error('Error!', error.message);
                 alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
-                // คืนค่าปุ่ม
                 btn.innerText = originalText;
                 btn.disabled = false;
                 btn.classList.remove('opacity-70', 'cursor-not-allowed');
@@ -364,6 +384,10 @@
         }
 
         function confirmCancel() {
+            const bookings = getLocalBookings();
+            bookings.pop(); // เอาล่าสุดออก (คืนโต๊ะ)
+            localStorage.setItem('coco_bookings', JSON.stringify(bookings));
+
             document.getElementById('cancel-modal').classList.add('hidden');
             document.getElementById('success-section').classList.add('hidden');
             document.getElementById('booking-section').classList.remove('hidden');
@@ -373,6 +397,35 @@
 
         function goToHome() {
             location.reload(); 
+        }
+
+        // ฟังก์ชัน Reset ระบบ (Clear Data)
+        function resetSystem() {
+            if(confirm('คุณต้องการล้างข้อมูลการจองทั้งหมด (Reset Table) ใช่หรือไม่?')) {
+                localStorage.removeItem('coco_bookings');
+                alert('ล้างข้อมูลเรียบร้อย โต๊ะว่างทั้งหมดแล้ว');
+                location.reload();
+            }
+        }
+
+        const MAX_TABLES = 10;
+
+        function getLocalBookings() {
+            const stored = localStorage.getItem('coco_bookings');
+            return stored ? JSON.parse(stored) : [];
+        }
+
+        function findLowestAvailableTable() {
+            const bookings = getLocalBookings();
+            const takenTables = bookings.map(b => parseInt(b.table));
+
+            // *** แก้ไขตรงนี้: เริ่มจาก 1 ถึง 10 ***
+            for (let i = 8; i <= MAX_TABLES; i++) {
+                if (!takenTables.includes(i)) {
+                    return i; 
+                }
+            }
+            return null;
         }
     </script>
 </body>
