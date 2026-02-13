@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COCO Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <title>COCO Mala Booking System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,230 +20,407 @@
                         'coco-pink': '#eccac8',
                         'coco-blue': '#4a86b0',
                         'coco-red': '#dd5647',
+                        'coco-salmon': '#ef9a9a',
                         'coco-red-hover': '#c0392b',
+                        'coco-green': '#2ecc71',
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-white text-gray-800 flex h-screen overflow-hidden font-sans">
+<body class="bg-white text-gray-800 font-sans">
 
-    <nav class="w-[260px] bg-white pt-5 border-r border-gray-100 flex-shrink-0 flex flex-col">
-        <div class="h-[70px]"></div> <div class="flex items-center py-3 px-5 mx-5 my-1 rounded-lg text-sm cursor-pointer transition bg-coco-pink text-black font-medium" 
-             id="menu-queue" 
-             onclick="switchPage('queue')">
-            <i class="fas fa-list w-8 text-base"></i> การแสดงคิว
-        </div>
-        
-        <div class="flex items-center py-3 px-5 mx-5 my-1 rounded-lg text-sm cursor-pointer transition hover:bg-gray-50 text-gray-700" 
-             id="menu-booking" 
-             onclick="switchPage('booking')">
-            <i class="fas fa-file-alt w-8 text-base"></i> การกรอกรับคิว
-        </div>
-    </nav>
+    <div id="booking-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex justify-center items-center z-50 transition-opacity duration-300">
+        <div class="bg-white rounded-2xl shadow-2xl w-[650px] p-10 relative border border-gray-100">
+            <button onclick="closeModal()" class="absolute top-5 right-5 text-coco-red hover:text-red-700 transition">
+                <i class="fas fa-times-circle text-4xl"></i>
+            </button>
 
-    <main class="flex-grow flex flex-col bg-white">
-        <header class="h-[70px] px-10 flex justify-between items-center border-b border-gray-100">
-            <div class="flex items-center text-lg font-semibold text-gray-700">
-                <img src="/Users/noey/Downloads/e50f8b93-18f8-4480-8630-f70b125dcaf9.png" 
-                     alt="Logo" 
-                     class="w-10 h-10 rounded-full bg-gray-200 object-cover mr-4 border border-gray-200"> 
+            <div class="space-y-6 text-xl text-gray-800 mt-2">
+                <div class="font-medium text-2xl mb-8">ชื่อผู้จอง : <span id="m-name" class="font-normal"></span></div>
+                
+                <div>เบอร์ : <span id="m-phone"></span></div>
+                
+                <div class="flex justify-between items-center">
+                    <div>รหัสคิว : <span id="m-queue" class="font-medium text-2xl"></span></div>
+                    <div id="m-date" class="text-gray-700 text-xl"></div>
+                </div>
+
+                <div class="mt-4">ลำดับโต๊ะ : <span id="m-table"></span></div>
+                
+                <div>เวลา : <span id="m-time"></span></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="login-view" class="h-screen flex flex-col bg-white">
+        <header class="h-[70px] px-8 flex justify-between items-center border-b border-gray-100">
+            <div class="flex items-center text-lg font-bold text-black">
+                <div class="w-10 h-10 rounded-full bg-gray-200 mr-3 overflow-hidden border border-gray-100 flex-shrink-0">
+                    <img src="/Users/noey/Downloads/e50f8b93-18f8-4480-8630-f70b125dcaf9.png" alt="Logo" class="w-full h-full object-cover">
+                </div>
                 COCO Mala Booking
             </div>
-            <a href="#" class="text-sm text-gray-600 hover:text-red-500 transition">ออกจากระบบ</a>
+            <div class="text-sm font-medium cursor-pointer">แผนที่</div>
         </header>
 
-        <div class="p-10 overflow-y-auto h-full">
-            
-            <div id="page-queue">
-                <h1 class="text-4xl mb-10 font-medium text-gray-800">การรับคิว</h1>
-                <div class="w-full border border-gray-200 rounded-lg overflow-hidden">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-white text-gray-700 border-b border-gray-100">
-                                <th class="p-6 font-medium">ชื่อ</th>
-                                <th class="p-6 font-medium">เบอร์</th>
-                                <th class="p-6 font-medium">กลุ่ม</th>
-                                <th class="p-6 font-medium">เวลา</th>
-                                <th class="p-6 font-medium">สถานะ</th>
-                                <th class="p-6 font-medium">ดำเนินการ</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-50">
-                            <tr>
-                                <td class="p-6">เนย</td>
-                                <td class="p-6"></td>
-                                <td class="p-6">2</td>
-                                <td class="p-6">20 : 00 น.</td>
-                                <td class="p-6">
-                                    <span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800" 
-                                          data-status="processing"
-                                          onclick="changeStatus(this)">
-                                          กำลังดำเนินการ
-                                    </span>
-                                </td>
-                                <td class="p-6"><button class="skip-btn text-gray-500 hover:text-gray-700 text-sm">Skip</button></td>
-                            </tr>
-                            <tr>
-                                <td class="p-6">ทิม</td>
-                                <td class="p-6"></td>
-                                <td class="p-6">3</td>
-                                <td class="p-6">20 : 00 น.</td>
-                                <td class="p-6">
-                                    <span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800" 
-                                          data-status="processing"
-                                          onclick="changeStatus(this)">
-                                          กำลังดำเนินการ
-                                    </span>
-                                </td>
-                                <td class="p-6"><button class="skip-btn text-gray-500 hover:text-gray-700 text-sm">Skip</button></td>
-                            </tr>
-                            <tr>
-                                <td class="p-6">บลู</td>
-                                <td class="p-6"></td>
-                                <td class="p-6">4</td>
-                                <td class="p-6">15 : 00 น.</td>
-                                <td class="p-6">
-                                    <span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800" 
-                                          data-status="processing"
-                                          onclick="changeStatus(this)">
-                                          กำลังดำเนินการ
-                                    </span>
-                                </td>
-                                <td class="p-6"><button class="skip-btn text-gray-500 hover:text-gray-700 text-sm">Skip</button></td>
-                            </tr>
-                            <tr>
-                                <td class="p-6">โนอี้</td>
-                                <td class="p-6"></td>
-                                <td class="p-6">2</td>
-                                <td class="p-6">14 : 00 น.</td>
-                                <td class="p-6">
-                                    <span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800" 
-                                          data-status="processing"
-                                          onclick="changeStatus(this)">
-                                          กำลังดำเนินการ
-                                    </span>
-                                </td>
-                                <td class="p-6"><button class="skip-btn text-gray-500 hover:text-gray-700 text-sm">Skip</button></td>
-                            </tr>
-                            <tr>
-                                <td class="p-6">เสือ</td>
-                                <td class="p-6"></td>
-                                <td class="p-6">2</td>
-                                <td class="p-6">13 : 00 น.</td>
-                                <td class="p-6">
-                                    <span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">
-                                        เสร็จสิ้น
-                                    </span>
-                                </td>
-                                <td class="p-6"></td>
-                            </tr>
-                            <tr>
-                                <td class="p-6">มาตา</td>
-                                <td class="p-6"></td>
-                                <td class="p-6">1</td>
-                                <td class="p-6">13 : 00 น.</td>
-                                <td class="p-6">
-                                    <span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">
-                                        เสร็จสิ้น
-                                    </span>
-                                </td>
-                                <td class="p-6"></td>
-                            </tr>
-                            <tr>
-                                <td class="p-6">จินนี่</td>
-                                <td class="p-6"></td>
-                                <td class="p-6">2</td>
-                                <td class="p-6">13 : 00 น.</td>
-                                <td class="p-6">
-                                    <span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">
-                                        เสร็จสิ้น
-                                    </span>
-                                </td>
-                                <td class="p-6"></td>
-                            </tr>
-                             <tr>
-                                <td class="p-6">เอวา</td>
-                                <td class="p-6"></td>
-                                <td class="p-6">1</td>
-                                <td class="p-6">12 : 00 น.</td>
-                                <td class="p-6">
-                                    <span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">
-                                        เสร็จสิ้น
-                                    </span>
-                                </td>
-                                <td class="p-6"></td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div class="flex-grow flex flex-col justify-center items-center px-4">
+            <h1 class="text-4xl mb-12 font-medium text-black">เข้าสู่ระบบ</h1>
 
-            <div id="page-booking" class="hidden">
-                <h1 class="text-4xl mb-10 font-medium text-gray-800">การกรอกรับคิว</h1>
-                
-                <div class="mt-12">
-                    <label class="block text-lg mb-4 text-gray-700">กรุณากรอกเบอร์ของลูกค้าเพื่อยืนยันคิว</label>
-                    
-                    <div class="mb-6">
-                        <input type="text" class="w-full max-w-[450px] p-4 text-lg border border-gray-300 rounded-lg outline-none text-gray-700 focus:border-coco-blue focus:ring-1 focus:ring-coco-blue placeholder-gray-400" placeholder="เบอร์">
+            <div class="w-full max-w-[450px]">
+                <div class="mb-6">
+                    <label class="block text-lg mb-2 text-gray-800">เบอร์ :</label>
+                    <input type="text" class="w-full p-3 text-lg border border-gray-200 rounded-md outline-none focus:border-coco-salmon placeholder-gray-400" placeholder="กรอกเบอร์">
+                </div>
+
+                <div class="mb-10">
+                    <label class="block text-lg mb-2 text-gray-800">OTP:</label>
+                    <div class="flex gap-2">
+                        <input type="text" class="flex-grow p-3 text-lg border border-gray-200 rounded-md outline-none focus:border-coco-salmon placeholder-gray-400" placeholder="กรอก OTP ของคุณ">
+                        <button class="bg-gray-400 text-white px-4 py-2 rounded-md hover:bg-gray-500 transition text-sm min-w-[100px]">ส่งรหัส OTP</button>
                     </div>
+                </div>
 
-                    <button class="bg-coco-red text-white py-3 px-6 text-lg rounded-md hover:bg-coco-red-hover transition duration-200" onclick="alert('ตรวจสอบข้อมูล...')">ตรวจสอบข้อมูลการจอง</button>
+                <div class="flex justify-center">
+                    <button onclick="handleLogin()" class="bg-[#f09589] text-white py-3 px-12 text-lg rounded-md hover:opacity-90 transition duration-200 shadow-sm">
+                        เข้าสู่ระบบ
+                    </button>
                 </div>
             </div>
-
         </div>
-    </main>
+        <div class="p-4 text-right text-gray-400 text-xs">เข้าสู่ระบบสำหรับ Admin</div>
+    </div>
+
+    <div id="dashboard-view" class="hidden h-screen overflow-hidden flex">
+        
+        <nav class="w-[260px] bg-white pt-5 border-r border-gray-100 flex-shrink-0 flex flex-col">
+            <div class="h-[70px]"></div> 
+            <div class="flex items-center py-3 px-5 mx-5 my-1 rounded-lg text-sm cursor-pointer transition bg-coco-pink text-black font-medium" 
+                 id="menu-queue" onclick="switchPage('queue')">
+                <i class="fas fa-list w-8 text-base"></i> การแสดงคิว
+            </div>
+            
+            <div class="flex items-center py-3 px-5 mx-5 my-1 rounded-lg text-sm cursor-pointer transition hover:bg-gray-50 text-gray-700" 
+                 id="menu-booking" onclick="switchPage('booking')">
+                <i class="fas fa-file-alt w-8 text-base"></i> การกรอกรับคิว
+            </div>
+        </nav>
+
+        <main class="flex-grow flex flex-col bg-white">
+            <header class="h-[70px] px-10 flex justify-between items-center border-b border-gray-100">
+                <div class="flex items-center text-lg font-semibold text-gray-700">
+                    <img src="/Users/noey/Downloads/e50f8b93-18f8-4480-8630-f70b125dcaf9.png" alt="Logo" class="w-10 h-10 rounded-full bg-gray-200 object-cover mr-4 border border-gray-200"> 
+                    COCO Mala Booking
+                </div>
+                <a href="#" onclick="handleLogout()" class="text-sm text-gray-600 hover:text-red-500 transition">ออกจากระบบ</a>
+            </header>
+
+            <div class="p-10 overflow-y-auto h-full">
+                
+                <div id="page-queue">
+                    <h1 class="text-4xl mb-10 font-medium text-gray-800">การรับคิว</h1>
+                    <div class="w-full border border-gray-200 rounded-lg overflow-hidden">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-white text-gray-700 border-b border-gray-100">
+                                    <th class="p-6 font-medium">ชื่อ</th>
+                                    <th class="p-6 font-medium">เบอร์</th>
+                                    <th class="p-6 font-medium">กลุ่ม</th>
+                                    <th class="p-6 font-medium">เวลา</th>
+                                    <th class="p-6 font-medium">สถานะ</th>
+                                    <th class="p-6 font-medium">ดำเนินการ</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <tr>
+                                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium" 
+                                        onclick="showModal('เนย', '0981112222', '#1001', '25/02/2569', '5', '20:00 น.')">
+                                        เนย
+                                    </td>
+                                    <td class="p-6">0981112222</td>
+                                    <td class="p-6">2</td>
+                                    <td class="p-6">20 : 00 น.</td>
+                                    <td class="p-6">
+                                        <span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800" 
+                                              data-status="processing" onclick="changeStatus(this)">กำลังดำเนินการ</span>
+                                    </td>
+                                    <td class="p-6"><button class="skip-btn text-gray-500 hover:text-gray-700 text-sm" onclick="deleteRow(this)">Skip</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium" 
+                                        onclick="showModal('ทิม', '0983334444', '#1002', '25/02/2569', '6', '20:00 น.')">
+                                        ทิม
+                                    </td>
+                                    <td class="p-6">0983334444</td>
+                                    <td class="p-6">3</td>
+                                    <td class="p-6">20 : 00 น.</td>
+                                    <td class="p-6">
+                                        <span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800" 
+                                              data-status="processing" onclick="changeStatus(this)">กำลังดำเนินการ</span>
+                                    </td>
+                                    <td class="p-6"><button class="skip-btn text-gray-500 hover:text-gray-700 text-sm" onclick="deleteRow(this)">Skip</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium" 
+                                        onclick="showModal('โซเฟีย', '0985556666', '#1003', '25/02/2569', '3', '17:00 น.')">
+                                        โซเฟีย
+                                    </td>
+                                    <td class="p-6">0985556666</td>
+                                    <td class="p-6">2</td>
+                                    <td class="p-6">17 : 00 น.</td>
+                                    <td class="p-6">
+                                        <span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800" 
+                                              data-status="processing" onclick="changeStatus(this)">กำลังดำเนินการ</span>
+                                    </td>
+                                    <td class="p-6"><button class="skip-btn text-gray-500 hover:text-gray-700 text-sm" onclick="deleteRow(this)">Skip</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium" 
+                                        onclick="showModal('บลู', '0987778888', '#1004', '25/02/2569', '4', '15:00 น.')">
+                                        บลู
+                                    </td>
+                                    <td class="p-6">0987778888</td>
+                                    <td class="p-6">4</td>
+                                    <td class="p-6">15 : 00 น.</td>
+                                    <td class="p-6">
+                                        <span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800" 
+                                              data-status="processing" onclick="changeStatus(this)">กำลังดำเนินการ</span>
+                                    </td>
+                                    <td class="p-6"><button class="skip-btn text-gray-500 hover:text-gray-700 text-sm" onclick="deleteRow(this)">Skip</button></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium" 
+                                        onclick="showModal('โนอี้', '0989998888', '#12345', '25/01/2569', '7', '14:00 น.')">
+                                        โนอี้
+                                    </td>
+                                    <td class="p-6">0989998888</td>
+                                    <td class="p-6">2</td>
+                                    <td class="p-6">14 : 00 น.</td>
+                                    <td class="p-6">
+                                        <span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800" 
+                                              data-status="processing" onclick="changeStatus(this)">กำลังดำเนินการ</span>
+                                    </td>
+                                    <td class="p-6"><button class="skip-btn text-gray-500 hover:text-gray-700 text-sm" onclick="deleteRow(this)">Skip</button></td>
+                                </tr>
+                                
+                                <tr>
+                                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium"
+                                        onclick="showModal('เสือ', '0991111111', '#0001', '25/02/2569', '2', '13:00 น.', true)">
+                                        เสือ
+                                    </td>
+                                    <td class="p-6">0991111111</td>
+                                    <td class="p-6">2</td>
+                                    <td class="p-6">13 : 00 น.</td>
+                                    <td class="p-6">
+                                        <span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">เสร็จสิ้น</span>
+                                    </td>
+                                    <td class="p-6"></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium"
+                                        onclick="showModal('มาตา', '0992222222', '#0002', '25/02/2569', '1', '13:00 น.', true)">
+                                        มาตา
+                                    </td>
+                                    <td class="p-6">0992222222</td>
+                                    <td class="p-6">1</td>
+                                    <td class="p-6">13 : 00 น.</td>
+                                    <td class="p-6">
+                                        <span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">เสร็จสิ้น</span>
+                                    </td>
+                                    <td class="p-6"></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium"
+                                        onclick="showModal('จินนี่', '0993333333', '#0003', '25/02/2569', '2', '13:00 น.', true)">
+                                        จินนี่
+                                    </td>
+                                    <td class="p-6">0993333333</td>
+                                    <td class="p-6">2</td>
+                                    <td class="p-6">13 : 00 น.</td>
+                                    <td class="p-6">
+                                        <span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">เสร็จสิ้น</span>
+                                    </td>
+                                    <td class="p-6"></td>
+                                </tr>
+                                <tr>
+                                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium"
+                                        onclick="showModal('เอวา', '0994444444', '#0004', '25/02/2569', '1', '12:00 น.', true)">
+                                        เอวา
+                                    </td>
+                                    <td class="p-6">0994444444</td>
+                                    <td class="p-6">1</td>
+                                    <td class="p-6">12 : 00 น.</td>
+                                    <td class="p-6">
+                                        <span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">เสร็จสิ้น</span>
+                                    </td>
+                                    <td class="p-6"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div id="page-booking" class="hidden">
+                    <h1 class="text-4xl mb-10 font-medium text-gray-800">การกรอกรับคิว</h1>
+                    
+                    <div class="mt-12">
+                        <label class="block text-lg mb-4 text-gray-700">กรุณากรอกเบอร์ของลูกค้าเพื่อยืนยันคิว</label>
+                        
+                        <div class="mb-6">
+                            <input type="text" 
+                                   id="booking-phone" 
+                                   class="w-full max-w-[450px] p-4 text-lg border border-gray-300 rounded-lg outline-none text-gray-700 focus:border-coco-blue focus:ring-1 focus:ring-coco-blue placeholder-gray-400" 
+                                   placeholder="เบอร์โทรศัพท์ 10 หลัก"
+                                   maxlength="10"
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                        </div>
+
+                        <button class="bg-coco-red text-white py-3 px-6 text-lg rounded-md hover:bg-coco-red-hover transition duration-200" 
+                                onclick="checkBooking()">
+                            ตรวจสอบข้อมูลการจอง
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
 
     <script>
-        // ฟังก์ชันสลับหน้า
+        // --- Login / Logout ---
+        function handleLogin() {
+            document.getElementById('login-view').classList.add('hidden');
+            const dashboard = document.getElementById('dashboard-view');
+            dashboard.classList.remove('hidden');
+            dashboard.classList.add('flex');
+        }
+
+        function handleLogout() {
+            const dashboard = document.getElementById('dashboard-view');
+            dashboard.classList.add('hidden');
+            dashboard.classList.remove('flex');
+            document.getElementById('login-view').classList.remove('hidden');
+        }
+
+        // --- Sidebar ---
         function switchPage(pageName) {
-            // ซ่อนหน้าทั้งหมด
             document.getElementById('page-queue').classList.add('hidden');
             document.getElementById('page-booking').classList.add('hidden');
-
-            // แสดงหน้าที่เลือก
             document.getElementById('page-' + pageName).classList.remove('hidden');
 
-            // Reset สไตล์ปุ่มเมนูให้เป็นแบบปกติ (สีพื้นขาว)
             const menuItems = ['menu-queue', 'menu-booking'];
             menuItems.forEach(id => {
                 const el = document.getElementById(id);
-                // ลบ class ของสถานะ Active
                 el.classList.remove('bg-coco-pink', 'text-black', 'font-medium');
-                // เพิ่ม class ของสถานะปกติ
                 el.classList.add('hover:bg-gray-50', 'text-gray-700');
             });
             
-            // ใส่สไตล์ปุ่ม Active (สีชมพู)
             const activeMenu = document.getElementById('menu-' + pageName);
             activeMenu.classList.remove('hover:bg-gray-50', 'text-gray-700');
             activeMenu.classList.add('bg-coco-pink', 'text-black', 'font-medium');
         }
 
-        // ฟังก์ชันเปลี่ยนสถานะ (อัปเดตให้รองรับ Tailwind Classes)
+        // --- Table Actions ---
         function changeStatus(element) {
-            // เช็คจาก data-attribute แทน class เพราะเราใช้ Tailwind
             if (element.getAttribute('data-status') === 'processing') {
-                
-                // 1. เปลี่ยนข้อความ
                 element.innerText = "เสร็จสิ้น";
-                
-                // 2. เปลี่ยนสี (ลบสีเทา ใส่สีฟ้า)
                 element.classList.remove('bg-gray-100', 'text-gray-800', 'hover:opacity-80', 'cursor-pointer');
                 element.classList.add('bg-coco-blue', 'text-white');
-                
-                // อัปเดต status เพื่อไม่ให้กดซ้ำได้
                 element.setAttribute('data-status', 'completed');
                 
-                // 3. ซ่อนปุ่ม Skip
                 var row = element.closest('tr');
                 var skipBtn = row.querySelector('.skip-btn');
                 if (skipBtn) {
                     skipBtn.classList.add('hidden');
                 }
+            }
+        }
+
+        function deleteRow(btnElement) {
+            if (confirm("ต้องการข้ามคิวนี้ (ลบออกจากรายการ) ใช่หรือไม่?")) {
+                var row = btnElement.closest('tr');
+                if (row) {
+                    row.remove();
+                }
+            }
+        }
+
+        // --- Modal Logic ---
+        function showModal(name, phone, queue, date, table, time, isCompleted = false) {
+            document.getElementById('m-name').innerText = name;
+            document.getElementById('m-phone').innerText = phone;
+            
+            const queueEl = document.getElementById('m-queue');
+            
+            if (isCompleted) {
+                queueEl.innerText = "Completed";
+                queueEl.classList.remove('text-coco-red');
+                queueEl.classList.add('text-coco-green');
+            } else {
+                queueEl.innerText = queue;
+                queueEl.classList.remove('text-coco-green');
+                queueEl.classList.add('text-coco-red');
+            }
+
+            document.getElementById('m-date').innerText = date;
+            document.getElementById('m-table').innerText = table;
+            document.getElementById('m-time').innerText = time;
+            document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('booking-modal').classList.add('hidden');
+        }
+
+        // --- Mock Database ---
+        const mockDatabase = {
+            // Active
+            '0981112222': { name: 'เนย', queue: '#1001', date: '25/02/2569', table: '5', time: '20:00 น.', completed: false },
+            '0983334444': { name: 'ทิม', queue: '#1002', date: '25/02/2569', table: '6', time: '20:00 น.', completed: false },
+            '0985556666': { name: 'โซเฟีย', queue: '#1003', date: '25/02/2569', table: '3', time: '17:00 น.', completed: false },
+            '0987778888': { name: 'บลู', queue: '#1004', date: '25/02/2569', table: '4', time: '15:00 น.', completed: false },
+            '0989998888': { name: 'โนอี้', queue: '#12345', date: '25/01/2569', table: '7', time: '14:00 น.', completed: false },
+            
+            // Completed
+            '0991111111': { name: 'เสือ', queue: '#0001', date: '25/02/2569', table: '2', time: '13:00 น.', completed: true },
+            '0992222222': { name: 'มาตา', queue: '#0002', date: '25/02/2569', table: '1', time: '13:00 น.', completed: true },
+            '0993333333': { name: 'จินนี่', queue: '#0003', date: '25/02/2569', table: '2', time: '13:00 น.', completed: true },
+            '0994444444': { name: 'เอวา', queue: '#0004', date: '25/02/2569', table: '1', time: '12:00 น.', completed: true },
+        };
+
+        function checkBooking() {
+            const phoneInput = document.getElementById('booking-phone');
+            const phoneNumber = phoneInput.value;
+
+            if (phoneNumber.length !== 10) {
+                alert("กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก");
+                return;
+            }
+            
+            const userData = mockDatabase[phoneNumber];
+
+            if (userData) {
+                showModal(
+                    userData.name,      
+                    phoneNumber,          
+                    userData.queue,             
+                    userData.date,         
+                    userData.table,                 
+                    userData.time,
+                    userData.completed 
+                );
+            } else {
+                showModal(
+                    'ไม่พบรายชื่อ (ลูกค้าใหม่)',      
+                    phoneNumber,          
+                    '-',             
+                    '-',         
+                    '-',                 
+                    '-',
+                    false 
+                );
             }
         }
     </script>
