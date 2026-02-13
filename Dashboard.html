@@ -270,7 +270,6 @@
 
     <script>
         // --- 1. MOCK DATABASE ---
-        // ข้อมูลจำลอง (ตัวแปรนี้จะถูกอัปเดตเมื่อมีการเปลี่ยนสถานะในตาราง)
         const mockDatabase = {
             // Active Users
             '0981112222': { name: 'เนย', queue: '#1001', date: '25/02/2569', table: '5', time: '20:00 น.', completed: false },
@@ -321,10 +320,9 @@
 
         // --- 4. STATUS CHANGE LOGIC (IMPORTANT) ---
         function changeStatus(element) {
-            // เช็คว่าสถานะตอนนี้คือ processing หรือไม่
             if (element.getAttribute('data-status') === 'processing') {
                 
-                // 1. เปลี่ยนหน้าตา UI (สี, ข้อความ)
+                // UI Update
                 element.innerText = "เสร็จสิ้น";
                 element.classList.remove('bg-gray-100', 'text-gray-800', 'hover:opacity-80', 'cursor-pointer');
                 element.classList.add('bg-coco-blue', 'text-white');
@@ -336,11 +334,9 @@
                     skipBtn.classList.add('hidden');
                 }
 
-                // 2. [ส่วนที่เพิ่มใหม่] อัปเดตข้อมูลใน Database จริงๆ
-                // ดึงเบอร์จาก data-phone ที่เราแปะไว้ใน HTML
+                // Database Update
                 const phoneNumber = element.getAttribute('data-phone');
                 if (phoneNumber && mockDatabase[phoneNumber]) {
-                    // เปลี่ยนสถานะใน DB เป็น completed
                     mockDatabase[phoneNumber].completed = true;
                     console.log("Updated status for " + phoneNumber + " to completed.");
                 }
@@ -356,8 +352,14 @@
             }
         }
 
-        // --- 5. MODAL POPUP ---
+        // --- 5. MODAL POPUP (UPDATED) ---
         function showModal(name, phone, queue, date, table, time, isCompleted = false) {
+            
+            // Check real-time status from DB first
+            if (mockDatabase[phone]) {
+                isCompleted = mockDatabase[phone].completed;
+            }
+
             document.getElementById('m-name').innerText = name;
             document.getElementById('m-phone').innerText = phone;
             
@@ -393,7 +395,6 @@
                 return;
             }
             
-            // ค้นหาใน DB (ซึ่งข้อมูลอาจถูกอัปเดตจากฟังก์ชัน changeStatus แล้ว)
             const userData = mockDatabase[phoneNumber];
 
             if (userData) {
