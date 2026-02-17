@@ -159,6 +159,10 @@
     </div>
 
     <script>
+        // *******************************************************
+        // ใส่ URL ที่ได้จาก Google Apps Script ตรงนี้ครับ
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwtEUI8YZr_nWHZNI_QD-qMHQz_Wp_EaGYMAUiIDP1hDHD4ID3ksQN5Q6LiwVN0bStW/exec'; 
+        // *******************************************************
 
         let currentPax = null;
 
@@ -173,6 +177,7 @@
             const time = document.getElementById('time-value').value;
             const btn = document.getElementById('submit-btn');
 
+            // แก้ไข 2: เปลี่ยน phone.length >= 9 เป็น phone.length === 10
             if (name && phone.length === 10 && pax && time) {
                 btn.classList.remove('bg-primaryLight', 'hover:bg-red-300');
                 btn.classList.add('bg-[#EE3F3E]', 'hover:bg-red-400');
@@ -273,6 +278,7 @@
             let isValid = true;
             if (!name) { showError('name'); isValid = false; }
             if (!phone) { showError('phone'); isValid = false; }
+            // แก้ไข 3: เปลี่ยน < 9 เป็น !== 10
             else if (phone.length !== 10) { 
                 showError('phone');
                 alert('กรุณากรอกเบอร์โทรศัพท์ให้ครบ 10 หลัก');
