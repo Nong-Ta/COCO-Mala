@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div id="login-view" class="h-screen flex flex-col bg-white">
+   <div id="login-view" class="h-screen flex flex-col bg-white">
         <header class="h-[70px] px-8 flex justify-between items-center border-b border-gray-100">
             <div class="flex items-center text-lg font-bold text-black">
                 <div class="w-10 h-10 rounded-full bg-gray-200 mr-3 overflow-hidden border border-gray-100 flex-shrink-0">
@@ -83,14 +83,19 @@
                 </div>
 
                 <div class="flex justify-center">
-                    <button onclick="handleLogin()" class="bg-[#f09589] text-white py-3 px-12 text-lg rounded-md hover:opacity-90 transition duration-200 shadow-sm">
+                    <button class="bg-[#f09589] text-white py-3 px-12 text-lg rounded-md opacity-80 cursor-default shadow-sm">
                         เข้าสู่ระบบ
                     </button>
                 </div>
             </div>
         </div>
-        <div class="p-4 text-right text-gray-400 text-xs">เข้าสู่ระบบสำหรับ Admin</div>
+        <div class="p-4 text-right">
+            <span onclick="handleLogin()" class="text-gray-400 text-xs cursor-pointer hover:text-gray-600 transition underline decoration-dotted">
+                เข้าสู่ระบบสำหรับ Admin
+            </span>
+        </div>
     </div>
+        </div>
 
     <div id="dashboard-view" class="hidden h-screen overflow-hidden flex">
         
