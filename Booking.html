@@ -40,9 +40,9 @@
             <span class="font-bold text-lg tracking-wide">COCO Mala Booking</span>
         </div>
         <ul class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
-            <li class="cursor-pointer hover:text-black" onclick="goToHome()">หน้าหลัก</li>
+            <li class="cursor-pointer hover:text-black" onclick="window.location.href='Main_Booking.html'">หน้าหลัก</li>
             <li class="cursor-pointer hover:text-black"><a href="https://maps.google.com" target="_blank">แผนที่</a></li>
-            <li class="cursor-pointer hover:text-black"><a href="my_booking.html">คิวของคุณ</a></li>
+            <li class="cursor-pointer hover:text-black"><a href="My_Booking.html">คิวของคุณ</a></li>
             <li class="cursor-pointer text-red-500 hover:text-red-700 font-bold" onclick="resetSystem()">ออกจากระบบ</li>
         </ul>
     </nav>
@@ -363,10 +363,14 @@
 
         function confirmCancel() {
             const bookings = getLocalBookings();
-            if(bookings.length > 0) {
-                bookings[bookings.length - 1].status = 'cancelled';
-                localStorage.setItem('coco_bookings', JSON.stringify(bookings));
+            // หา booking ล่าสุดที่ยังเป็น active แล้วยกเลิก
+            for (let i = bookings.length - 1; i >= 0; i--) {
+                if (bookings[i].status === 'active' || !bookings[i].status) {
+                    bookings[i].status = 'cancelled';
+                    break;
+                }
             }
+            localStorage.setItem('coco_bookings', JSON.stringify(bookings));
             closeCancelModal();
             goToHome();
         }

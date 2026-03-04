@@ -26,7 +26,7 @@
             <span class="font-bold text-lg tracking-wide">COCO Mala Booking</span>
         </div>
         <ul class="hidden md:flex gap-8 text-sm font-medium text-gray-600">
-            <li class="cursor-pointer hover:text-black" onclick="window.location.href='Booking.html'">หน้าหลัก</li>
+            <li class="cursor-pointer hover:text-black" onclick="window.location.href='Main_Booking.html'">หน้าหลัก</li>
             <li class="cursor-pointer text-black font-bold border-b-2 border-red-500" onclick="window.location.href='my_booking.html'">คิวของคุณ</li>
         </ul>
     </nav>
@@ -43,21 +43,17 @@
         });
 
         function renderHistory() {
-            // ดึงข้อมูลจริงจาก LocalStorage
             const stored = localStorage.getItem('coco_bookings');
             const bookings = stored ? JSON.parse(stored) : [];
             
-            const container = document.querySelector('.space-y-6'); // หรือใส่ id="history-container" ที่ div หลักก็ได้
+            const container = document.getElementById('history-container');
             
-            // ถ้ายังไม่มี id ให้ใส่ id="history-container" ที่ div class="space-y-6" ก่อนนะครับ
-            // เพื่อความชัวร์ ผมจะใช้ getElementById ถ้าคุณแก้ HTML แล้ว
-            // ถ้ายังไม่แก้ ให้ใช้ logic นี้:
             if(bookings.length === 0) {
                 container.innerHTML = '<p class="text-center text-gray-400 mt-10">ไม่มีประวัติการจอง</p>';
                 return;
             }
 
-            container.innerHTML = ''; // ล้างข้อมูลตัวอย่าง (Hardcode) ออก
+            container.innerHTML = '';
 
             // วนลูปสร้างประวัติ (ล่าสุดขึ้นก่อน)
             bookings.slice().reverse().forEach(booking => {
