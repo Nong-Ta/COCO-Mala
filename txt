@@ -1,0 +1,20 @@
+// prisma/schema.prisma
+
+// 1. กำหนดการเชื่อมต่อฐานข้อมูล (ตัวอย่างเป็น SQLite หรือเปลี่ยนเป็น MySQL/Postgres ตามต้องการ)
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// 2. กำหนด Generator สำหรับสร้าง Client
+generator client {
+  provider = "prisma-client-js"
+}
+
+// 3. วาง Model Admin ของคุณตรงนี้
+model Admin {
+  id       String @id @default(uuid())
+  username String // ชื่อที่ใช้ล็อกอิน [cite: 609, 610, 696, 697]
+  phone    String @unique // เบอร์โทรศัพท์ [cite: 611, 612, 699, 700]
+  password String // รหัสผ่าน [cite: 613, 614, 702, 703]
+}
