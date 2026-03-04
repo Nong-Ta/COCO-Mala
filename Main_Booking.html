@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COCO Mala Booking</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Prompt', 'sans-serif'] }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-white text-gray-800 font-sans">
+
+    <!-- NAV -->
+    <nav class="border-b border-gray-200 py-4 px-6 flex justify-between items-center sticky top-0 bg-white z-50">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
+                <img src="Logo-COCO/COCO Mala.jpg" alt="Logo" class="w-full h-full object-cover">
+            </div>
+            <span class="font-bold text-base">COCO Mala Booking</span>
+        </div>
+        <ul class="hidden md:flex gap-8 text-sm font-medium text-gray-500 list-none">
+            <li><a href="https://maps.google.com" target="_blank"
+                    class="hover:text-gray-900 transition-colors no-underline">แผนที่</a></li>
+            <li><a href="My_Booking.html" class="hover:text-gray-900 transition-colors no-underline">คิวของฉัน</a></li>
+            <li><a href="Booking.html" class="hover:text-gray-900 transition-colors no-underline">จองคิว</a></li>
+            <li><a href="#" class="text-[#EE3F3E] font-semibold hover:underline no-underline"
+                    onclick="resetSystem()">ออกจากระบบ</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="max-w-5xl mx-auto px-6 py-24 text-center">
+        <div class="relative rounded-2xl overflow-hidden">
+            <img src="Logo-COCO/IMG_0713.jpg" class="w-full h-[500] object-cover">
+
+            <div class="absolute inset-0 bg-black/40"></div>
+
+            <div class="absolute inset-0 flex flex-col items-center justify-center text-white z-10">
+                <h1 class="text-4xl font-bold mb-4">COCO Mala Tang</h1>
+                <p class="text-gray-500 text-base mb-2">จองคิวออนไลน์ล่วงหน้า ไม่ต้องรอหน้าร้าน</p>
+                <p class="text-gray-400 text-sm mb-10">เปิดรับจอง 08:00 - 21:00 น.</p>
+                <a href="Booking.html"
+                    class="inline-block px-10 py-3.5 bg-[#EE3F3E] text-white text-base font-semibold rounded-lg hover:bg-[#C93030] transition-colors shadow-sm no-underline">
+                    จองคิวเลย
+                </a>
+                <div class="mt-4">
+                    <a href="My_Booking.html"
+                        class="text-sm text-gray-400 hover:text-gray-700 transition-colors no-underline underline">
+                        ดูคิวของฉัน
+                    </a>
+                </div>
+    </section>
+
+
+
+    <!-- DIVIDER -->
+    <div class="border-t border-gray-100 max-w-2xl mx-auto"></div>
+
+    <!-- FEATURES -->
+    <section class="max-w-2xl mx-auto px-6 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+                <div class="text-3xl mb-3">⚡</div>
+                <div class="font-semibold text-sm mb-1">รับคิวทันที</div>
+                <div class="text-gray-400 text-xs leading-relaxed">กรอกข้อมูลง่ายๆ ระบบออกรหัสคิวให้ทันที</div>
+            </div>
+            <div>
+                <div class="text-3xl mb-3">📋</div>
+                <div class="font-semibold text-sm mb-1">ดูคิวได้ตลอด</div>
+                <div class="text-gray-400 text-xs leading-relaxed">ตรวจสอบ ดูประวัติ หรือยกเลิกคิวได้เองทุกเมื่อ</div>
+            </div>
+            <div>
+                <div class="text-3xl mb-3">🪑</div>
+                <div class="font-semibold text-sm mb-1">จัดโต๊ะอัตโนมัติ</div>
+                <div class="text-gray-400 text-xs leading-relaxed">ระบบเลือกโต๊ะว่างให้ รองรับสูงสุด 10 โต๊ะ</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- DIVIDER -->
+    <div class="border-t border-gray-100 max-w-2xl mx-auto"></div>
+
+    <!-- HOW TO -->
+    <section class="max-w-2xl mx-auto px-6 py-16">
+        <h2 class="text-lg font-bold text-center mb-10 text-gray-700">วิธีการจอง</h2>
+        <div class="flex flex-col gap-6">
+            <div class="flex items-start gap-4">
+                <div
+                    class="w-8 h-8 rounded-full bg-[#EE3F3E] text-white text-sm font-bold flex items-center justify-center flex-shrink-0">
+                    1</div>
+                <div>
+                    <div class="font-semibold text-sm">กรอกข้อมูล</div>
+                    <div class="text-gray-400 text-xs mt-0.5">ชื่อ เบอร์โทร จำนวนคน และเวลาที่ต้องการ</div>
+                </div>
+            </div>
+            <div class="flex items-start gap-4">
+                <div
+                    class="w-8 h-8 rounded-full bg-[#EE3F3E] text-white text-sm font-bold flex items-center justify-center flex-shrink-0">
+                    2</div>
+                <div>
+                    <div class="font-semibold text-sm">รับคิว</div>
+                    <div class="text-gray-400 text-xs mt-0.5">ระบบจัดสรรโต๊ะและออกคิวให้อัตโนมัติ</div>
+                </div>
+            </div>
+            <div class="flex items-start gap-4">
+                <div
+                    class="w-8 h-8 rounded-full bg-[#EE3F3E] text-white text-sm font-bold flex items-center justify-center flex-shrink-0">
+                    3</div>
+                <div>
+                    <div class="font-semibold text-sm">มาตรงเวลา</div>
+                    <div class="text-gray-400 text-xs mt-0.5">แจ้งเบอร์โทรศัพท์ที่จองกับร้านภายใน 5 นาทีหลังถึงเวลานัด
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-gray-100 py-8 text-center text-xs text-gray-400">
+        © 2025 COCO Mala Tang · ระบบจองคิวออนไลน์
+    </footer>
+
+</body>
+
+<script>
+    function resetSystem() {
+        if (confirm('ล้างข้อมูลการจองทั้งหมด (Reset Table) ใช่หรือไม่?')) {
+            localStorage.removeItem('coco_bookings');
+            location.reload();
+        }
+    }
+</script>
+
+</html>
