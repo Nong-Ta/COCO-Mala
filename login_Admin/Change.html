@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COCO Mala Booking - เปลี่ยนรหัสผ่าน</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Kanit', sans-serif; background-color: #fcfcfc; }
+        input::placeholder { color: #d1d5db; }
+        .btn-save   { background-color: #ff8a80; transition: all 0.3s ease; }
+        .btn-active { background-color: #ED3B2B !important; }
+        .btn-error  { background-color: #FC938A !important; }
+        .error-text { color: #F46363; font-size: 0.75rem; margin-left: 0.25rem; display: none; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <nav class="border-b border-gray-200 py-4 px-6 flex justify-between items-center sticky top-0 bg-white z-50">
+        <div class="flex items-center gap-2">
+            <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-200 flex-shrink-0">
+                <img src="../Logo-COCO/COCO Mala.jpg" alt="Logo" class="w-full h-full object-cover">
+            </div>
+            <span class="font-bold text-lg tracking-wide">COCO หม่าล่าทั่ง</span>
+        </div>
+    </nav>
+
+    <div class="flex-grow flex items-center justify-center p-6">
+    <div class="w-full max-w-[400px] bg-white rounded-[2.5rem] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-50 p-10 flex flex-col items-center">
+        <h1 class="text-[1.25rem] font-medium text-gray-700 mb-2 text-center">เปลี่ยนรหัสผ่าน</h1>
+        <p class="text-gray-400 text-sm mb-8 text-center">กรอกรหัสผ่านใหม่ที่ต้องการ</p>
+
+        <div class="w-full space-y-6">
+
+            <!-- รหัสผ่านใหม่ -->
+            <div class="space-y-1">
+                <label class="block text-gray-800 text-sm ml-1">รหัสผ่านใหม่ :</label>
+                <div class="relative">
+                    <input type="password" id="newPass" placeholder="รหัสผ่านใหม่ (อย่างน้อย 4 ตัว)"
+                        class="w-full px-5 py-3.5 rounded-2xl border border-gray-200 focus:outline-none focus:ring-1 focus:ring-orange-300 bg-white text-gray-600 transition-all pr-12">
+                    <button type="button" onclick="togglePass('newPass', 'eye1')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <i id="eye1" data-lucide="eye" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <span id="newPassError" class="error-text">กรุณากรอกรหัสผ่านใหม่</span>
+            </div>
+
+            <!-- ยืนยันรหัสผ่าน -->
+            <div class="space-y-1">
+                <label class="block text-gray-800 text-sm ml-1">ยืนยันรหัสผ่าน :</label>
+                <div class="relative">
+                    <input type="password" id="confirmPass" placeholder="กรอกรหัสผ่านอีกครั้ง"
+                        class="w-full px-5 py-3.5 rounded-2xl border border-gray-200 focus:outline-none focus:ring-1 focus:ring-orange-300 bg-white text-gray-600 transition-all pr-12">
+                    <button type="button" onclick="togglePass('confirmPass', 'eye2')" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                        <i id="eye2" data-lucide="eye" class="w-5 h-5"></i>
+                    </button>
+                </div>
+                <span id="confirmPassError" class="error-text">รหัสผ่านไม่ตรงกัน</span>
+            </div>
+
+            <div class="flex gap-4 pt-4">
+                <a href="LoginAdmin.html"
+                    class="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-500 font-medium py-3.5 rounded-2xl transition-all active:scale-[0.98] text-center flex items-center justify-center">
+                    ยกเลิก
+                </a>
+                <button type="button" id="saveBtn"
+                    class="btn-save w-1/2 text-white font-medium py-3.5 rounded-2xl shadow-sm transition-all active:scale-[0.98]">
+                    บันทึก
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="hidden fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center p-6 z-50">
+        <div class="bg-white w-full max-w-xs rounded-[2rem] p-8 flex flex-col items-center text-center">
+            <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                <i data-lucide="check" class="w-7 h-7 text-green-500"></i>
+            </div>
+            <h2 class="text-lg font-medium text-gray-800 mb-2">เปลี่ยนรหัสผ่านสำเร็จ</h2>
+            <p class="text-gray-500 text-sm mb-6">กรุณาเข้าสู่ระบบด้วยรหัสผ่านใหม่</p>
+            <button onclick="goToLogin()" class="w-full bg-[#ED3B2B] hover:bg-[#d32f22] text-white py-3 rounded-xl shadow-sm transition-colors font-medium">ตกลง</button>
+        </div>
+    </div>
+
+    <script src="admin-data.js"></script>
+    <script>
+        lucide.createIcons();
+
+        // Guard: ถ้าไม่ได้ผ่านการยืนยันตัวตน ให้กลับไปหน้า forgot
+        if (localStorage.getItem('adminVerified') !== 'true') {
+            window.location.replace('forgot_Admin.html');
+        }
+
+        const newPassInput     = document.getElementById('newPass');
+        const confirmPassInput = document.getElementById('confirmPass');
+        const saveBtn          = document.getElementById('saveBtn');
+        const newPassError     = document.getElementById('newPassError');
+        const confirmPassError = document.getElementById('confirmPassError');
+
+        function togglePass(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon  = document.getElementById(iconId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.setAttribute('data-lucide', 'eye-off');
+            } else {
+                input.type = 'password';
+                icon.setAttribute('data-lucide', 'eye');
+            }
+            lucide.createIcons();
+        }
+
+        function validateForm() {
+            const newPass     = newPassInput.value;
+            const confirmPass = confirmPassInput.value;
+            saveBtn.classList.remove('btn-error');
+
+            // ตรวจรหัสผ่านใหม่ (ต้อง >= 4 ตัว)
+            if (newPass.length >= 4) {
+                newPassError.style.display = 'none';
+            }
+            // ตรวจว่าตรงกันไหม (เมื่อเริ่มพิมพ์ช่องยืนยันแล้ว)
+            if (confirmPass.length > 0 && newPass === confirmPass) {
+                confirmPassError.style.display = 'none';
+            }
+
+            if (newPass.length >= 4 && confirmPass.length > 0 && newPass === confirmPass) {
+                saveBtn.classList.add('btn-active');
+            } else {
+                saveBtn.classList.remove('btn-active');
+            }
+        }
+
+        newPassInput.addEventListener('input', validateForm);
+        confirmPassInput.addEventListener('input', validateForm);
+
+        saveBtn.addEventListener('click', () => {
+            const newPass     = newPassInput.value;
+            const confirmPass = confirmPassInput.value;
+            let hasError = false;
+
+            if (newPass.length < 4) {
+                newPassError.textContent  = 'รหัสผ่านต้องมีอย่างน้อย 4 ตัว';
+                newPassError.style.display = 'block';
+                hasError = true;
+            }
+            if (newPass !== confirmPass) {
+                confirmPassError.style.display = 'block';
+                hasError = true;
+            }
+            if (hasError) return;
+
+            // ── บันทึกรหัสผ่านใหม่ผ่าน admin-data.js ──
+            const result = changePassword(newPass, confirmPass);
+            if (result.success) {
+                localStorage.removeItem('adminVerified'); // เคลียร์ flag
+                document.getElementById('successModal').classList.remove('hidden');
+                lucide.createIcons();
+            }
+        });
+
+        function goToLogin() {
+            window.location.href = 'LoginAdmin.html';
+        }
+    </script>
+</body>
+</html>
