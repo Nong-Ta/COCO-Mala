@@ -85,7 +85,7 @@
             card.innerHTML = `
                     <div class="flex-1 bg-[#FFF0F0] p-6 flex flex-col justify-center relative border-r-2 border-dashed border-gray-400">
                         <p class="font-bold">ชื่อผู้จอง : <span class="font-normal">${booking.name}</span></p>
-                        <p class="font-bold">เบอร์ : <span class="font-normal">${booking.phone.substring(0, 3)}-XXXXXXX</span></p>
+                        <p class="font-bold">เบอร์ : <span class="font-normal">${booking.phone.substring(0, 3)}-${booking.phone.substring(3, 10)}</span></p>
                         <p class="font-bold">รหัสคิว : <span class="text-[#EE3F3E]">${booking.queue}</span></p>
                         <p class="font-bold">ลำดับโต๊ะ : <span class="font-normal">${booking.table}</span></p>
                         <p class="font-bold">เวลา : <span class="font-normal">${booking.time}</span></p>

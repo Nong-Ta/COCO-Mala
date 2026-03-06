@@ -49,6 +49,12 @@
                 </div>
                 <div class="mt-4">ลำดับโต๊ะ : <span id="m-table"></span></div>
                 <div>เวลา : <span id="m-time"></span></div>
+                <div class="pt-4">
+                    <button id="approve-btn" onclick="approveBooking()"
+                        class="hidden w-full bg-green-500 hover:bg-green-600 text-white font-medium py-3 rounded-xl transition">
+                        ✓ อนุมัติยืนยันตัวตน
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -86,15 +92,25 @@
                 <div id="page-queue">
                     <h1 class="text-4xl mb-10 font-medium text-gray-800">การรับคิว</h1>
                     <div class="w-full border border-gray-200 rounded-lg overflow-hidden">
-                        <table class="w-full text-left border-collapse">
+                        <table class="w-full border-collapse text-sm">
+                            <colgroup>
+                                <col style="width:18%">
+                                <col style="width:15%">
+                                <col style="width:8%">
+                                <col style="width:8%">
+                                <col style="width:12%">
+                                <col style="width:20%">
+                                <col style="width:12%">
+                            </colgroup>
                             <thead>
-                                <tr class="bg-white text-gray-700 border-b border-gray-100">
-                                    <th class="p-6 font-medium">ชื่อ</th>
-                                    <th class="p-6 font-medium">เบอร์</th>
-                                    <th class="p-6 font-medium">กลุ่ม</th>
-                                    <th class="p-6 font-medium">เวลา</th>
-                                    <th class="p-6 font-medium">สถานะ</th>
-                                    <th class="p-6 font-medium">ดำเนินการ</th>
+                                <tr class="bg-gray-50 text-gray-600 border-b border-gray-200">
+                                    <th class="px-5 py-4 font-medium text-center">ชื่อ</th>
+                                    <th class="px-5 py-4 font-medium text-center">เบอร์</th>
+                                    <th class="px-5 py-4 font-medium text-center">กลุ่ม</th>
+                                    <th class="px-5 py-4 font-medium text-center">โต๊ะ</th>
+                                    <th class="px-5 py-4 font-medium text-center">เวลา</th>
+                                    <th class="px-5 py-4 font-medium text-center">สถานะ</th>
+                                    <th class="px-5 py-4 font-medium text-center">ดำเนินการ</th>
                                 </tr>
                             </thead>
                             <tbody id="queue-tbody" class="divide-y divide-gray-50"></tbody>
@@ -150,24 +166,33 @@
                 const isCancelled = b.status === 'cancelled';
                 if (isCancelled) return; // ไม่แสดงที่ยกเลิกแล้ว
 
-                const statusBadge = isCompleted
-                    ? `<span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">เสร็จสิ้น</span>`
-                    : `<span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-gray-100 text-gray-800"
-                            data-index="${index}" onclick="changeStatus(this)">กำลังดำเนินการ</span>`;
+                const isProcessing = b.status === 'processing';
 
-                const skipBtn = isCompleted
+                let statusBadge = '';
+                if (isCompleted) {
+                    statusBadge = `<span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-coco-blue text-white">เสร็จสิ้น</span>`;
+                } else if (isProcessing) {
+                    statusBadge = `<span class="status-badge px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center cursor-pointer transition hover:opacity-80 select-none bg-orange-100 text-orange-700"
+                            data-index="${index}" onclick="changeStatus(this)">กำลังดำเนินการ</span>`;
+                } else {
+                    statusBadge = `<span class="px-6 py-2 rounded-full text-sm inline-block min-w-[140px] text-center select-none bg-gray-100 text-gray-400">รอยืนยัน</span>`;
+                }
+
+                const skipBtn = (isCompleted || isProcessing)
                     ? ''
                     : `<button class="skip-btn text-gray-500 hover:text-gray-700 text-sm" onclick="skipRow(${index})">Skip</button>`;
 
                 const row = document.createElement('tr');
+                row.className = 'border-b border-gray-50 hover:bg-gray-50 transition';
                 row.innerHTML = `
-                    <td class="p-6 cursor-pointer text-blue-600 hover:underline font-medium"
+                    <td class="px-5 py-4 text-center cursor-pointer text-blue-600 hover:underline font-medium"
                         onclick="showModal(${index})">${b.name}</td>
-                    <td class="p-6">${b.phone}</td>
-                    <td class="p-6">${b.people || '-'}</td>
-                    <td class="p-6">${b.time}</td>
-                    <td class="p-6">${statusBadge}</td>
-                    <td class="p-6">${skipBtn}</td>
+                    <td class="px-5 py-4 text-center text-gray-600">${b.phone}</td>
+                    <td class="px-5 py-4 text-center text-gray-600">${b.pax || '-'}</td>
+                    <td class="px-5 py-4 text-center text-gray-600">${b.table || '-'}</td>
+                    <td class="px-5 py-4 text-center text-gray-600">${b.time}</td>
+                    <td class="px-5 py-4 text-center">${statusBadge}</td>
+                    <td class="px-5 py-4 text-center">${skipBtn}</td>
                 `;
                 tbody.appendChild(row);
             });
@@ -218,7 +243,28 @@
                 queueEl.className = 'font-medium text-2xl text-coco-red';
             }
 
+            // แสดง/ซ่อนปุ่มอนุมัติตามสถานะ
+            const approveBtn = document.getElementById('approve-btn');
+            if (b.status === 'active') {
+                approveBtn.classList.remove('hidden');
+                approveBtn.setAttribute('data-index', index);
+            } else {
+                approveBtn.classList.add('hidden');
+            }
+
             document.getElementById('booking-modal').classList.remove('hidden');
+        }
+
+        function approveBooking() {
+            const approveBtn = document.getElementById('approve-btn');
+            const index = parseInt(approveBtn.getAttribute('data-index'));
+            const bookings = getBookings();
+            if (bookings[index]) {
+                bookings[index].status = 'processing';
+                saveBookings(bookings);
+                closeModal();
+                renderTable();
+            }
         }
 
         function closeModal() {
