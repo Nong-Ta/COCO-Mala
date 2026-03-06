@@ -9,7 +9,7 @@ const ADMIN_STORAGE_KEY = 'coco_admin';
 const DEFAULT_ADMIN = {
     username: 'Admin',
     phone: '0999999999',
-    password: '1234'
+    password: 'Admin1234'
 };
 
 // ดึงข้อมูล Admin จาก localStorage (ถ้าไม่มีใช้ค่า default)

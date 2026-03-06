@@ -84,7 +84,7 @@
     </main>
 
     <div class="absolute bottom-4 right-6 md:bottom-6 md:right-8">
-        <a href="login_Admin/LoginAdmin.html" class="text-xs text-gray-300 hover:text-gray-400 transition-colors font-light">
+        <a href="../Login_Admin/LoginAdmin.html" class="text-xs text-gray-300 hover:text-gray-400 transition-colors font-light">
             เข้าสู่ระบบสำหรับ Admin
         </a>
     </div>
@@ -212,7 +212,7 @@
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('savedPhone', phoneInput.value);
             // กลับไปหน้าที่ค้างไว้ หรือ Main_Booking
-            const redirect = localStorage.getItem('redirectAfterLogin') || 'Booking/Main_Booking.html';
+            const redirect = localStorage.getItem('redirectAfterLogin') || '../Booking/Main_Booking.html';
             localStorage.removeItem('redirectAfterLogin');
             window.location.href = redirect;
         }

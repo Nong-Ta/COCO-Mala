@@ -9,12 +9,38 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Kanit', sans-serif; background-color: #fcfcfc; }
-        input::placeholder { color: #d1d5db; }
-        .btn-login  { background-color: #ff8a80; transition: all 0.3s ease; }
-        .btn-active { background-color: #ED3B2B !important; }
-        .btn-error  { background-color: #FC938A !important; }
-        .error-text { color: #F46363; font-size: 0.75rem; margin-left: 0.25rem; display: none; }
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #fcfcfc;
+        }
+
+        input::placeholder {
+            color: #d1d5db;
+        }
+
+        .btn-login {
+            background-color: #ff8a80;
+            transition: all 0.3s ease;
+        }
+        button:disabled {
+            cursor: not-allowed !important;
+            pointer-events: auto !important;
+        }
+
+        .btn-active {
+            background-color: #ED3B2B !important;
+        }
+
+        .btn-error {
+            background-color: #FC938A !important;
+        }
+
+        .error-text {
+            color: #F46363;
+            font-size: 0.75rem;
+            margin-left: 0.25rem;
+            display: none;
+        }
     </style>
 </head>
 
@@ -32,7 +58,8 @@
 
     <!-- flex-grow ทำให้ส่วนนี้ขยายเต็มพื้นที่ที่เหลือ login card จะอยู่กลาง -->
     <div class="flex-grow flex items-center justify-center p-6">
-        <div class="w-full max-w-[400px] bg-white rounded-[2.5rem] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-50 p-10 flex flex-col items-center">
+        <div
+            class="w-full max-w-[400px] bg-white rounded-[2.5rem] shadow-[0_4px_20px_rgba(0,0,0,0.05)] border border-gray-50 p-10 flex flex-col items-center">
             <h1 class="text-[1.25rem] font-medium text-gray-700 mb-10 text-center">เข้าสู่ระบบสำหรับ Admin</h1>
 
             <div class="w-full space-y-6">
@@ -64,14 +91,15 @@
                 </div>
 
                 <div class="pt-4">
-                    <button type="button" id="loginBtn"
-                        class="btn-login w-full text-white font-medium py-3.5 rounded-2xl shadow-sm transition-all active:scale-[0.98]">
-                        เข้าสู่ระบบ
+                    <button type="button" id="loginBtn" disabled
+                        class="btn-login w-full text-white font-medium py-3.5 rounded-2xl shadow-sm transition-all cursor-not-allowed">
+                        <a href="../Dashboard_Admin/Dashboard.html">เข้าสู่ระบบ</a>
                     </button>
                 </div>
 
                 <div class="text-center pt-2">
-                    <a href="Forgot_Admin.html" class="text-gray-400 text-sm hover:text-gray-600 transition-colors">ลืมรหัสผ่าน?</a>
+                    <a href="Forgot_Admin.html"
+                        class="text-gray-400 text-sm hover:text-gray-600 transition-colors">ลืมรหัสผ่าน?</a>
                 </div>
             </div>
         </div>
@@ -91,15 +119,15 @@
     <script>
         lucide.createIcons();
 
-        const nameInput  = document.getElementById('adminName');
+        const nameInput = document.getElementById('adminName');
         const phoneInput = document.getElementById('adminPhone');
-        const passInput  = document.getElementById('adminPass');
-        const loginBtn   = document.getElementById('loginBtn');
-        const eyeIcon    = document.getElementById('eyeIcon');
+        const passInput = document.getElementById('adminPass');
+        const loginBtn = document.getElementById('loginBtn');
+        const eyeIcon = document.getElementById('eyeIcon');
         const errorModal = document.getElementById('errorModal');
-        const nameError  = document.getElementById('nameError');
+        const nameError = document.getElementById('nameError');
         const phoneError = document.getElementById('phoneError');
-        const passError  = document.getElementById('passError');
+        const passError = document.getElementById('passError');
 
         function togglePassword() {
             if (passInput.type === 'password') {
@@ -113,17 +141,25 @@
         }
 
         function validateForm() {
-            const name  = nameInput.value.trim();
+            const name = nameInput.value.trim();
             const phone = phoneInput.value.trim();
-            const pass  = passInput.value.trim();
+            const pass = passInput.value.trim();
+            const passLengthError = document.getElementById('passLengthError');
+
             loginBtn.classList.remove('btn-error');
-            if (name)  nameError.style.display  = 'none';
+            if (name) nameError.style.display = 'none';
             if (phone) phoneError.style.display = 'none';
-            if (pass)  passError.style.display  = 'none';
-            if (name && phone && pass) {
-                loginBtn.classList.add('btn-active');
+            if (pass) passError.style.display = 'none';
+
+            // เปิด/ปิดปุ่มตามเงื่อนไข
+            if (name && phone && pass.length >= 8) {
+                loginBtn.removeAttribute('disabled');
+                loginBtn.classList.remove('btn-login', 'cursor-not-allowed');
+                loginBtn.classList.add('btn-active', 'cursor-pointer', 'active:scale-[0.98]');
             } else {
-                loginBtn.classList.remove('btn-active');
+                loginBtn.setAttribute('disabled', 'true');
+                loginBtn.classList.add('btn-login', 'cursor-not-allowed');
+                loginBtn.classList.remove('btn-active', 'cursor-pointer', 'active:scale-[0.98]');
             }
         }
 
@@ -138,14 +174,14 @@
         passInput.addEventListener('input', validateForm);
 
         loginBtn.addEventListener('click', () => {
-            const name  = nameInput.value.trim();
+            const name = nameInput.value.trim();
             const phone = phoneInput.value.trim();
-            const pass  = passInput.value;
+            const pass = passInput.value;
             let hasEmpty = false;
 
-            if (!name)  { nameError.style.display  = 'block'; hasEmpty = true; }
+            if (!name) { nameError.style.display = 'block'; hasEmpty = true; }
             if (!phone) { phoneError.style.display = 'block'; hasEmpty = true; }
-            if (!pass)  { passError.style.display  = 'block'; hasEmpty = true; }
+            if (!pass) { passError.style.display = 'block'; hasEmpty = true; }
             if (hasEmpty) return;
 
             const result = loginAdmin(name, phone, pass);
@@ -170,12 +206,12 @@
 
         function closeModal() {
             errorModal.classList.add('hidden');
-            nameInput.value  = '';
+            nameInput.value = '';
             phoneInput.value = '';
-            passInput.value  = '';
-            nameError.style.display  = 'none';
+            passInput.value = '';
+            nameError.style.display = 'none';
             phoneError.style.display = 'none';
-            passError.style.display  = 'none';
+            passError.style.display = 'none';
             loginBtn.classList.remove('btn-error', 'btn-active');
             passInput.type = 'password';
             eyeIcon.setAttribute('data-lucide', 'eye');
