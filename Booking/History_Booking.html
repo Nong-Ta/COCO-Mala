@@ -67,6 +67,9 @@
 
 
             if (status === 'active') {
+                statusColor = 'bg-gray-400';
+                statusText = 'รอยืนยัน';
+            } else if (status === 'processing') {
                 statusColor = 'bg-[#28a745]';
                 statusText = 'กำลังดำเนินการ';
             } else if (status === 'cancelled') {

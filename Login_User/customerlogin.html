@@ -24,7 +24,7 @@
 <body class="bg-white min-h-screen flex flex-col relative text-gray-900 font-sans">
 
     <nav class="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='Booking.html'">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="window.location.href='Main_Booking.html'">
             <div class="w-10 h-10 rounded-full overflow-hidden border border-gray-100 shadow-sm flex-shrink-0">
                 <img src="../Logo-COCO/COCO Mala.jpg" alt="Logo" class="w-full h-full object-cover">
             </div>
@@ -212,7 +212,7 @@
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('savedPhone', phoneInput.value);
             // กลับไปหน้าที่ค้างไว้ หรือ Main_Booking
-            const redirect = localStorage.getItem('redirectAfterLogin') || '../Booking/Main_Booking.html';
+            const redirect = localStorage.getItem('redirectAfterLogin') || 'Main_Booking.html';
             localStorage.removeItem('redirectAfterLogin');
             window.location.href = redirect;
         }

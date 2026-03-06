@@ -88,17 +88,18 @@
                         </button>
                     </div>
                     <span id="passError" class="error-text">กรุณากรอกข้อมูล</span>
+                    <span id="passLengthError" class="error-text">รหัสผ่านต้องมีอย่างน้อย 8 ตัว</span>
                 </div>
 
                 <div class="pt-4">
                     <button type="button" id="loginBtn" disabled
                         class="btn-login w-full text-white font-medium py-3.5 rounded-2xl shadow-sm transition-all cursor-not-allowed">
-                        <a href="../Dashboard_Admin/Dashboard.html">เข้าสู่ระบบ</a>
+                        เข้าสู่ระบบ
                     </button>
                 </div>
 
                 <div class="text-center pt-2">
-                    <a href="Forgot_Admin.html"
+                    <a href="forgot_Admin.html"
                         class="text-gray-400 text-sm hover:text-gray-600 transition-colors">ลืมรหัสผ่าน?</a>
                 </div>
             </div>
@@ -152,6 +153,12 @@
             if (pass) passError.style.display = 'none';
 
             // เปิด/ปิดปุ่มตามเงื่อนไข
+            if (pass.length > 0 && pass.length < 8) {
+                passLengthError.style.display = 'block';
+            } else {
+                passLengthError.style.display = 'none';
+            }
+
             if (name && phone && pass.length >= 8) {
                 loginBtn.removeAttribute('disabled');
                 loginBtn.classList.remove('btn-login', 'cursor-not-allowed');
@@ -212,7 +219,9 @@
             nameError.style.display = 'none';
             phoneError.style.display = 'none';
             passError.style.display = 'none';
-            loginBtn.classList.remove('btn-error', 'btn-active');
+            loginBtn.setAttribute('disabled', 'true');
+            loginBtn.classList.remove('btn-error', 'btn-active', 'cursor-pointer', 'active:scale-[0.98]');
+            loginBtn.classList.add('btn-login', 'cursor-not-allowed');
             passInput.type = 'password';
             eyeIcon.setAttribute('data-lucide', 'eye');
             lucide.createIcons();

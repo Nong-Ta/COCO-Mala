@@ -72,7 +72,7 @@
         container.innerHTML = '';
 
         // กรองเอาเฉพาะสถานะ 'active' (หรือไม่มีสถานะก็ถือว่า active)
-        const activeBookings = bookings.filter(b => b.status === 'active' || !b.status);
+        const activeBookings = bookings.filter(b => b.status === 'active' || b.status === 'processing' || !b.status);
 
         if (activeBookings.length === 0) {
             noMsg.classList.remove('hidden');

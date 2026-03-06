@@ -44,8 +44,8 @@ function changePassword(newPassword, confirmPassword) {
     if (newPassword !== confirmPassword) {
         return { success: false, message: 'รหัสผ่านไม่ตรงกัน' };
     }
-    if (newPassword.length < 4) {
-        return { success: false, message: 'รหัสผ่านต้องมีอย่างน้อย 4 ตัว' };
+    if (newPassword.length < 8) {
+        return { success: false, message: 'รหัสผ่านต้องมีอย่างน้อย 8 ตัว' };
     }
     const admin = getAdmin();
     admin.password = newPassword;

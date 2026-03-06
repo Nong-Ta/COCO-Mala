@@ -33,6 +33,13 @@
             window.location.href = '../Login_User/customerlogin.html';
         }
     </script>
+    <script src="../Login_Admin/admin-data.js"></script>
+    <script>
+        function doLogout() {
+            logoutAdmin();
+            window.location.href = '../Login_User/customerlogin.html';
+        }
+    </script>
 
     <!-- Booking Detail Modal -->
     <div id="booking-modal" class="fixed inset-0 bg-black bg-opacity-40 hidden flex justify-center items-center z-50">
@@ -106,7 +113,7 @@
                                 <tr class="bg-gray-50 text-gray-600 border-b border-gray-200">
                                     <th class="px-5 py-4 font-medium text-center">ชื่อ</th>
                                     <th class="px-5 py-4 font-medium text-center">เบอร์</th>
-                                    <th class="px-5 py-4 font-medium text-center">กลุ่ม</th>
+                                    <th class="px-5 py-4 font-medium text-center">จำนวนคน</th>
                                     <th class="px-5 py-4 font-medium text-center">โต๊ะ</th>
                                     <th class="px-5 py-4 font-medium text-center">เวลา</th>
                                     <th class="px-5 py-4 font-medium text-center">สถานะ</th>
