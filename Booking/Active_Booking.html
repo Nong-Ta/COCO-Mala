@@ -91,6 +91,11 @@
             const card = document.createElement('div');
             card.className = 'w-full bg-[#FFF0F0] rounded-2xl p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm';
 
+            const isProcessing = booking.status === 'processing';
+
+            // card สีต่างกันตาม status
+            card.className = `w-full ${isProcessing ? 'bg-[#FFF8E1]' : 'bg-[#FFF0F0]'} rounded-2xl p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm`;
+
             card.innerHTML = `
                     <div class="space-y-1 text-gray-800 font-medium text-lg w-full md:w-auto">
                         <p>ชื่อผู้จอง : <span class="font-normal text-gray-600">${booking.name}</span></p>
@@ -103,10 +108,16 @@
                     <div class="flex flex-row md:flex-row items-center justify-between w-full md:w-auto gap-8 md:gap-12 mt-4 md:mt-0">
                         <span class="text-gray-800 font-medium text-lg">${displayDate}</span>
                         
-                        <button onclick="cancelBooking(${realIndex})" 
-                            class="px-6 py-3 bg-[#EE3F3E] text-white text-base font-bold rounded-lg hover:bg-red-700 transition shadow-md whitespace-nowrap">
-                            ยกเลิกการจอง
-                        </button>
+                        ${isProcessing
+                            ? `<div class="flex items-center gap-2 px-6 py-3 bg-[#28a745] text-white text-base font-bold rounded-lg shadow-md whitespace-nowrap">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>
+                                ยืนยันตัวตนแล้ว
+                               </div>`
+                            : `<button onclick="cancelBooking(${realIndex})"
+                                class="px-6 py-3 bg-[#EE3F3E] text-white text-base font-bold rounded-lg hover:bg-red-700 transition shadow-md whitespace-nowrap">
+                                ยกเลิกการจอง
+                               </button>`
+                        }
                     </div>
                 `;
             container.appendChild(card);
