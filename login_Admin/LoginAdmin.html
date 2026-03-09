@@ -141,6 +141,8 @@
             lucide.createIcons();
         }
 
+        // ตรวจ input ทุกช่องแบบ real-time
+        // enable ปุ่ม login เมื่อ: ชื่อ + เบอร์ + รหัส >= 8 ตัว
         function validateForm() {
             const name = nameInput.value.trim();
             const phone = phoneInput.value.trim();
@@ -152,7 +154,7 @@
             if (phone) phoneError.style.display = 'none';
             if (pass) passError.style.display = 'none';
 
-            // เปิด/ปิดปุ่มตามเงื่อนไข
+            // แสดง error รหัสสั้นเกิน ทันทีที่พิมพ์
             if (pass.length > 0 && pass.length < 8) {
                 passLengthError.style.display = 'block';
             } else {
@@ -180,27 +182,34 @@
         });
         passInput.addEventListener('input', validateForm);
 
+        // กดปุ่ม Login → ตรวจว่าไม่ว่างทุกช่อง
+        // แล้วเรียก loginAdmin() จาก admin-data.js
         loginBtn.addEventListener('click', () => {
             const name = nameInput.value.trim();
             const phone = phoneInput.value.trim();
             const pass = passInput.value;
             let hasEmpty = false;
 
+            // ตรวจทุกช่อง ถ้าว่าง → แสดง error และหยุด
             if (!name) { nameError.style.display = 'block'; hasEmpty = true; }
             if (!phone) { phoneError.style.display = 'block'; hasEmpty = true; }
             if (!pass) { passError.style.display = 'block'; hasEmpty = true; }
             if (hasEmpty) return;
 
+            // ส่งไปตรวจกับ admin-data.js
             const result = loginAdmin(name, phone, pass);
             if (result.success) {
                 window.location.href = '../Dashboard_Admin/Dashboard.html';
             } else {
                 errorModal.classList.remove('hidden');
                 loginBtn.classList.remove('btn-active');
-                loginBtn.classList.add('btn-error');
+                loginBtn.classList.add('btn-error'); // ปุ่มเปลี่ยนเป็นสีผิดพลาด
             }
         });
 
+        // รองรับการกด Enter:
+        // ถ้า Error Modal เปิดอยู่ → ปิด Modal
+        // ถ้าไม่ → กด Login
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 if (!errorModal.classList.contains('hidden')) {

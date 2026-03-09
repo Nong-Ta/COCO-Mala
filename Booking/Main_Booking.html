@@ -131,29 +131,33 @@
 </body>
 
 <script>
+    // ตรวจว่าลูกค้า login อยู่ไหม
     function isLoggedIn() {
         return localStorage.getItem('isLoggedIn') === 'true';
     }
 
-    // ตรวจ login ก่อนไปหน้าที่ต้อง login
+    // Guard: ตรวจ login ก่อนเข้าหน้าที่ต้องการ auth
+    // ถ้ายังไม่ login → เก็บ page ที่จะไปไว้ใน redirectAfterLogin
+    // แล้วพาไปหน้า Login ก่อน หลัง login สำเร็จจะ redirect กลับมา
     function requireLogin(page) {
         if (isLoggedIn()) {
             window.location.href = page;
         } else {
-            localStorage.setItem('redirectAfterLogin', page);
+            localStorage.setItem('redirectAfterLogin', page); // จำหน้าที่จะไป
             window.location.href = '../Login_User/customerlogin.html';
         }
     }
 
+    // Logout ลูกค้า — ลบ login state และเบอร์โทร แล้วไปหน้า Login
     function logout() {
         if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('savedPhone');
+            localStorage.removeItem('isLoggedIn');  // ล้าง login flag
+            localStorage.removeItem('savedPhone');  // ล้างเบอร์ที่บันทึกไว้
             window.location.href = '../Login_User/customerlogin.html';
         }
     }
 
-    // แสดงปุ่ม login หรือ logout ตาม state
+    // สลับแสดงปุ่ม 'เข้าสู่ระบบ' หรือ 'ออกจากระบบ' ตาม login state
     function renderAuthBtn() {
         const el = document.getElementById('auth-btn');
         if (isLoggedIn()) {
@@ -163,7 +167,7 @@
         }
     }
 
-    // รันตอนโหลดหน้า
+    // เรียกทันทีเมื่อโหลดหน้า
     renderAuthBtn();
 </script>
 

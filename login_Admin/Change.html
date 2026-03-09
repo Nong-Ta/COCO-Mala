@@ -89,7 +89,9 @@
     <script>
         lucide.createIcons();
 
-        // Guard: ถ้าไม่ได้ผ่านการยืนยันตัวตน ให้กลับไปหน้า forgot
+        // Guard: ป้องกันการเข้าหน้านี้โดยตรง
+        // ถ้าไม่ได้ผ่าน forgot_Admin.html มาก่อน (ไม่มี adminVerified)
+        // → redirect กลับทันที โดยใช้ replace() เพื่อไม่ให้กด Back กลับมาได้
         if (localStorage.getItem('adminVerified') !== 'true') {
             window.location.replace('forgot_Admin.html');
         }
@@ -113,22 +115,24 @@
             lucide.createIcons();
         }
 
+        // ตรวจ input แบบ real-time
+        // enable ปุ่มบันทึกเมื่อ: รหัส >= 4 ตัว AND ทั้งสองช่องตรงกัน
         function validateForm() {
             const newPass     = newPassInput.value;
             const confirmPass = confirmPassInput.value;
             saveBtn.classList.remove('btn-error');
 
-            // ตรวจรหัสผ่านใหม่ (ต้อง >= 4 ตัว)
+            // ซ่อน error เมื่อผ่านเงื่อนไขแล้ว
             if (newPass.length >= 4) {
                 newPassError.style.display = 'none';
             }
-            // ตรวจว่าตรงกันไหม (เมื่อเริ่มพิมพ์ช่องยืนยันแล้ว)
+            // ตรวจว่าตรงกันไหม (เฉพาะเมื่อเริ่มพิมพ์ช่องยืนยันแล้ว)
             if (confirmPass.length > 0 && newPass === confirmPass) {
                 confirmPassError.style.display = 'none';
             }
 
             if (newPass.length >= 4 && confirmPass.length > 0 && newPass === confirmPass) {
-                saveBtn.classList.add('btn-active');
+                saveBtn.classList.add('btn-active'); // ปุ่มพร้อมกด
             } else {
                 saveBtn.classList.remove('btn-active');
             }
@@ -153,10 +157,10 @@
             }
             if (hasError) return;
 
-            // ── บันทึกรหัสผ่านใหม่ผ่าน admin-data.js ──
+            // เรียก changePassword() จาก admin-data.js
             const result = changePassword(newPass, confirmPass);
             if (result.success) {
-                localStorage.removeItem('adminVerified'); // เคลียร์ flag
+                localStorage.removeItem('adminVerified'); // ล้าง flag — ใช้แล้วทิ้ง
                 document.getElementById('successModal').classList.remove('hidden');
                 lucide.createIcons();
             }

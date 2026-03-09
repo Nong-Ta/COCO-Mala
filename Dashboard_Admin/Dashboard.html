@@ -190,10 +190,17 @@
                     : `<button class="skip-btn text-gray-500 hover:text-gray-700 text-sm" onclick="skipRow(${index})">Skip</button>`;
 
                 const row = document.createElement('tr');
-                row.className = 'border-b border-gray-50 hover:bg-gray-50 transition';
+                // กด row ทั้งแถวเพื่อเปิด Modal — ยกเว้น cell สุดท้าย (Skip button)
+                row.className = 'border-b border-gray-50 hover:bg-gray-100 transition cursor-pointer';
+                row.onclick = function(e) {
+                    // ถ้ากด Skip button ไม่ให้เปิด Modal
+                    if (e.target.closest('.skip-btn')) return;
+                    // ถ้ากด badge กำลังดำเนินการ ไม่ให้เปิด Modal (ให้ changeStatus ทำงาน)
+                    if (e.target.closest('.status-badge')) return;
+                    showModal(index);
+                };
                 row.innerHTML = `
-                    <td class="px-5 py-4 text-center cursor-pointer text-blue-600 hover:underline font-medium"
-                        onclick="showModal(${index})">${b.name}</td>
+                    <td class="px-5 py-4 text-center font-medium text-gray-800">${b.name}</td>
                     <td class="px-5 py-4 text-center text-gray-600">${b.phone}</td>
                     <td class="px-5 py-4 text-center text-gray-600">${b.pax || '-'}</td>
                     <td class="px-5 py-4 text-center text-gray-600">${b.table || '-'}</td>

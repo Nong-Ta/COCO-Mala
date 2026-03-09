@@ -182,16 +182,8 @@
 </body>
 
 <script>
-    // --- 1. ตั้งค่า URL ของ Google Apps Script ของคุณที่นี่ ---
-    const scriptURL = 'YOUR_APPS_SCRIPT_URL_HERE';
-    const MAX_TABLES = 10;
-    let currentPax = null;
-
-    document.addEventListener('DOMContentLoaded', () => {
-        generateTimeOptions();
-    });
-
-    // ฟังก์ชันจัดรูปแบบเบอร์โทร (08x-xxxxxxx)
+    // จัดรูปแบบเบอร์โทร 10 หลัก
+    // ใช้แสดงในหน้า success เท่านั้น (ไม่ได้บันทึกรูปแบบนี้)
     function formatPhoneNumber(phoneNumberString) {
         var cleaned = ('' + phoneNumberString).replace(/\D/g, '');
         var match = cleaned.match(/^(\d{3})(\d{3})(\d{4})$/);
@@ -201,6 +193,8 @@
         return phoneNumberString;
     }
 
+    // ตรวจทุก input แบบ real-time
+    // enable ปุ่มจองเมื่อครบทุกช่อง: ชื่อ + เบอร์ 10 หลัก + จำนวนคน + เวลา
     function checkFormCompletion() {
         const name = document.getElementById('name').value.trim();
         const phone = document.getElementById('phone').value.trim();
@@ -209,25 +203,29 @@
         const btn = document.getElementById('submit-btn');
 
         if (name && phone.length === 10 && pax && time) {
-            btn.classList.replace('bg-primaryLight', 'bg-[#EE3F3E]');
+            btn.classList.replace('bg-primaryLight', 'bg-[#EE3F3E]'); // เปิด
             btn.classList.add('hover:bg-red-400');
         } else {
-            btn.classList.replace('bg-[#EE3F3E]', 'bg-primaryLight');
+            btn.classList.replace('bg-[#EE3F3E]', 'bg-primaryLight'); // ปิด
             btn.classList.remove('hover:bg-red-400');
         }
     }
 
+    // กรองให้รับเฉพาะตัวเลขในช่องเบอร์โทร (oninput)
     function validatePhone(input) {
         input.value = input.value.replace(/[^0-9]/g, '');
     }
 
+    // แสดง error message ใต้ field และเพิ่ม border สีแดง
     function showError(fieldId) {
         document.getElementById(`error-${fieldId}`).classList.remove('hidden');
+        // time → ไฮไลท์ที่ trigger div / pax → ไม่มี border / อื่นๆ → ไฮไลท์ input
         const target = (fieldId === 'time') ? document.getElementById('time-trigger') :
             (fieldId === 'pax') ? null : document.getElementById(fieldId);
         if (target) target.classList.add('border-error');
     }
 
+    // ซ่อน error message และคืน border ปกติ
     function clearError(fieldId) {
         document.getElementById(`error-${fieldId}`).classList.add('hidden');
         const target = (fieldId === 'time') ? document.getElementById('time-trigger') :
@@ -238,6 +236,8 @@
         }
     }
 
+    // สร้าง option เวลา 11:00 – 21:00 น. แบบ dynamic
+    // ง่ายต่อการปรับเปลี่ยนช่วงเวลาเปิด-ปิดร้าน
     function generateTimeOptions() {
         const container = document.getElementById('time-options');
         let html = '';
@@ -251,33 +251,40 @@
         container.innerHTML = html;
     }
 
+    // เปิด/ปิด dropdown เวลา — stopPropagation ป้องกัน event bubbling ไป closeDropdown
     function toggleTimeDropdown(e) {
         e.stopPropagation();
         document.getElementById('time-options').classList.toggle('hidden');
     }
 
+    // เลือกเวลา → อัปเดต hidden input + เปลี่ยนสีข้อความ + ปิด dropdown
     function selectTime(time) {
         const display = document.getElementById('time-display');
         display.innerText = time;
-        display.classList.replace('text-gray-400', 'text-gray-800');
-        document.getElementById('time-value').value = time;
+        display.classList.replace('text-gray-400', 'text-gray-800'); // จาก placeholder → ค่าจริง
+        document.getElementById('time-value').value = time; // hidden input สำหรับ submit
         document.getElementById('time-options').classList.add('hidden');
         clearError('time');
         checkFormCompletion();
     }
 
+    // ปิด dropdown เวลาเมื่อ click นอก trigger area
     function closeDropdown(e) {
         if (!document.getElementById('time-trigger').contains(e.target)) {
             document.getElementById('time-options').classList.add('hidden');
         }
     }
 
+    // เลือกจำนวนคน (1-4)
+    // reset ปุ่มทุกตัวก่อน แล้ว highlight ปุ่มที่เลือก
     function selectPax(number) {
-        document.getElementById('pax-value').value = number;
+        document.getElementById('pax-value').value = number; // เก็บค่าใน hidden input
+        // reset สีปุ่มทั้งหมด
         document.querySelectorAll('.pax-btn').forEach(btn => {
             btn.classList.remove('bg-gray-400', 'text-white', 'border-gray-400');
             btn.classList.add('border-gray-200', 'text-gray-800');
         });
+        // highlight ปุ่มที่เลือก
         const activeBtn = document.querySelector(`.pax-btn[data-value="${number}"]`);
         if (activeBtn) {
             activeBtn.classList.replace('border-gray-200', 'bg-gray-400');
@@ -287,7 +294,8 @@
         checkFormCompletion();
     }
 
-    // --- ฟังก์ชันหลักในการจอง ---
+    // ฟังก์ชันหลักเมื่อกดปุ่มจอง
+    // ขั้นตอน: validate → หาโต๊ะว่าง → บันทึก localStorage → แสดง success → ส่ง Sheet
     function submitBooking() {
         const name = document.getElementById('name').value.trim();
         const phone = document.getElementById('phone').value.trim();
@@ -295,17 +303,19 @@
         const time = document.getElementById('time-value').value;
         const btn = document.getElementById('submit-btn');
 
+        // ตรวจทุก field — ถ้า invalid แสดง error และหยุด
         let isValid = true;
         if (!name) { showError('name'); isValid = false; }
         if (!phone || phone.length !== 10) { showError('phone'); isValid = false; }
         if (!pax) { showError('pax'); isValid = false; }
         if (!time) { showError('time'); isValid = false; }
-
         if (!isValid) return;
 
+        // หาโต๊ะที่ว่าง (หมายเลขต่ำสุดที่ไม่มีคนจอง active อยู่)
         const assignedTable = findLowestAvailableTable();
 
         if (assignedTable === null) {
+            // โต๊ะเต็มทุกโต๊ะ → แสดงหน้า full แทน
             document.getElementById('full-time-display').innerText = 'เวลา ' + time;
             document.getElementById('booking-section').classList.add('hidden');
             document.getElementById('full-section').classList.remove('hidden');
@@ -313,6 +323,7 @@
             return;
         }
 
+        // สร้างเลขคิว 4 หลักแบบสุ่ม เช่น #4821
         const randomQueue = '#' + Math.floor(1000 + Math.random() * 9000);
         const today = new Date();
         const dateStr = today.toLocaleDateString('th-TH', { day: '2-digit', month: '2-digit', year: 'numeric' });
@@ -326,15 +337,15 @@
             queue: randomQueue,
             table: assignedTable,
             date: dateStr,
-            status: 'active'
+            status: 'active' // สถานะเริ่มต้นเสมอ
         };
 
-        // 1. บันทึกลง LocalStorage ทันที
+        // 1. บันทึกลง localStorage ทันที (ไม่รอ network)
         const currentBookings = getLocalBookings();
         currentBookings.push(formData);
         localStorage.setItem('coco_bookings', JSON.stringify(currentBookings));
 
-        // 2. แสดงหน้าสำเร็จทันที
+        // 2. แสดงหน้า success ทันที
         document.getElementById('summary-name').innerText = name;
         document.getElementById('summary-phone').innerText = formatPhoneNumber(phone);
         document.getElementById('summary-queue').innerText = randomQueue;
@@ -345,22 +356,17 @@
         document.getElementById('booking-section').classList.add('hidden');
         document.getElementById('success-section').classList.remove('hidden');
         window.scrollTo(0, 0);
-
-        // 3. ส่ง Google Sheet (ทำงานเบื้องหลัง)
-        if (scriptURL && scriptURL !== 'YOUR_APPS_SCRIPT_URL_HERE') {
-            fetch(scriptURL, {
-                method: 'POST',
-                body: JSON.stringify(formData),
-                mode: 'no-cors'
-            }).catch(err => console.error('Sheet Error:', err));
-        }
     }
 
+    // ดึง booking ทั้งหมดจาก localStorage (คืน [] ถ้ายังไม่มี)
     function getLocalBookings() {
         const stored = localStorage.getItem('coco_bookings');
         return stored ? JSON.parse(stored) : [];
     }
 
+    // หาโต๊ะหมายเลขต่ำสุดที่ยังไม่มี active booking อยู่
+    // นับเฉพาะ status==='active' เพราะ processing/completed/cancelled ถือว่าโต๊ะว่างแล้ว
+    // คืน null ถ้าโต๊ะเต็มทุกโต๊ะ (MAX_TABLES = 10)
     function findLowestAvailableTable() {
         const bookings = getLocalBookings();
         const takenTables = bookings
@@ -370,16 +376,18 @@
         for (let i = 1; i <= MAX_TABLES; i++) {
             if (!takenTables.includes(i)) return i;
         }
-        return null;
+        return null; // โต๊ะเต็ม
     }
 
+    // รีเซตฟอร์มกลับสู่สถานะเริ่มต้น
+    // เรียกเมื่อกด 'จองคิวใหม่' หลังจองสำเร็จแล้ว
     function resetForm() {
         document.getElementById('name').value = '';
         document.getElementById('phone').value = '';
         document.getElementById('pax-value').value = '';
         document.getElementById('time-value').value = '';
         document.getElementById('time-display').innerText = 'เลือกเวลา';
-        document.getElementById('time-display').className = 'text-gray-400';
+        document.getElementById('time-display').className = 'text-gray-400'; // คืนสี placeholder
         document.querySelectorAll('.pax-btn').forEach(btn => {
             btn.className = 'pax-btn w-12 h-12 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition';
         });
@@ -390,13 +398,14 @@
     function openCancelModal() { document.getElementById('cancel-modal').classList.remove('hidden'); }
     function closeCancelModal() { document.getElementById('cancel-modal').classList.add('hidden'); }
 
+    // ยกเลิก booking ล่าสุดที่ยังเป็น active
+    // วนจากท้าย array ไปหน้า เพื่อได้ booking ที่เพิ่งจองล่าสุด
     function confirmCancel() {
         const bookings = getLocalBookings();
-        // หา booking ล่าสุดที่ยังเป็น active แล้วยกเลิก
         for (let i = bookings.length - 1; i >= 0; i--) {
             if (bookings[i].status === 'active' || !bookings[i].status) {
-                bookings[i].status = 'cancelled';
-                break;
+                bookings[i].status = 'cancelled'; // เปลี่ยนสถานะ (ไม่ลบข้อมูล)
+                break; // ยกเลิกแค่อันเดียว (ล่าสุดสุด)
             }
         }
         localStorage.setItem('coco_bookings', JSON.stringify(bookings));
@@ -404,6 +413,7 @@
         goToHome();
     }
 
+    // กลับหน้าหลัก
     function goToHome() { window.location.href = 'Main_Booking.html'; }
 </script>
 

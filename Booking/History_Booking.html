@@ -42,10 +42,13 @@
 </body>
 
 <script>
+    // เรียก renderHistory() เมื่อโหลด DOM เสร็จ
     document.addEventListener('DOMContentLoaded', () => {
         renderHistory();
     });
 
+    // แสดงประวัติการจองทั้งหมด (ทุก status)
+    // เรียงจากล่าสุดไปเก่าสุด ด้วย .slice().reverse()
     function renderHistory() {
         const stored = localStorage.getItem('coco_bookings');
         const bookings = stored ? JSON.parse(stored) : [];
@@ -59,24 +62,25 @@
 
         container.innerHTML = '';
 
-
         bookings.slice().reverse().forEach(booking => {
+            // ถ้าไม่มี status (ข้อมูลเก่า) ให้ถือว่าเป็น active
             const status = booking.status || 'active';
             let statusColor = '';
             let statusText = '';
 
 
+            // กำหนดสีและข้อความ badge ตาม status
             if (status === 'active') {
-                statusColor = 'bg-gray-400';
+                statusColor = 'bg-gray-400';     // เทา — รอยืนยัน
                 statusText = 'รอยืนยัน';
             } else if (status === 'processing') {
-                statusColor = 'bg-[#28a745]';
+                statusColor = 'bg-[#28a745]';    // เขียว — Admin อนุมัติแล้ว
                 statusText = 'กำลังดำเนินการ';
             } else if (status === 'cancelled') {
-                statusColor = 'bg-[#EE3F3E]';
+                statusColor = 'bg-[#EE3F3E]';    // แดง — ยกเลิก
                 statusText = 'ถูกยกเลิกแล้ว';
             } else if (status === 'completed') {
-                statusColor = 'bg-[#008CC9]';
+                statusColor = 'bg-[#008CC9]';    // ฟ้า — เสร็จสิ้น
                 statusText = 'เสร็จแล้ว';
             }
 

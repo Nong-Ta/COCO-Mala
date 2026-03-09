@@ -91,6 +91,7 @@
 </body>
 
 <script>
+    // ── อ้างอิง element ทั้งหมดในหน้า ──
     const phoneInput = document.getElementById('phoneInput');
     const phoneError = document.getElementById('phoneError');
     const otpInput = document.getElementById('otpInput');
@@ -98,10 +99,12 @@
     const otpBtn = document.getElementById('otpBtn');
     const loginBtn = document.getElementById('loginBtn');
 
+    // flag ป้องกันไม่ให้ปุ่ม OTP กลับมา enable ในระหว่างนับถอยหลัง
     let isTimerRunning = false;
 
+    // กรองให้รับเฉพาะตัวเลข (ลบตัวอักษรอื่นออกทันทีที่พิมพ์)
     phoneInput.addEventListener('input', function () {
-        this.value = this.value.replace(/\D/g, '');
+        this.value = this.value.replace(/\D/g, ''); // \D = ไม่ใช่ตัวเลข
         checkInputs();
     });
 
@@ -110,8 +113,9 @@
         checkInputs();
     });
 
+    // จัดการ paste — กรองเฉพาะตัวเลขและตัดเกิน 10 หลัก
     phoneInput.addEventListener('paste', function (e) {
-        e.preventDefault();
+        e.preventDefault(); // ป้องกัน paste ค่าดิบ
         const pasted = (e.clipboardData || window.clipboardData).getData('text');
         this.value = (this.value + pasted.replace(/\D/g, '')).slice(0, 10);
         checkInputs();
@@ -124,12 +128,14 @@
         checkInputs();
     });
 
+    // ตรวจสอบค่า input ทุกครั้งที่มีการเปลี่ยนแปลง
+    // และ enable/disable ปุ่มตาม state
     function checkInputs() {
         const phoneValue = phoneInput.value;
         const otpValue = otpInput.value;
 
-        const isPhoneValid = phoneValue.length === 10;
-        const isOtpValid = otpValue.length === 6;
+        const isPhoneValid = phoneValue.length === 10; // ต้องครบ 10 หลักเป๊ะ
+        const isOtpValid = otpValue.length === 6;       // ต้องครบ 6 หลักเป๊ะ
 
         if (phoneValue.length > 0 && !isPhoneValid) {
             phoneError.classList.remove('hidden');
@@ -147,6 +153,7 @@
             setErrorStyle(otpInput, false);
         }
 
+        // ปุ่ม OTP: enable เฉพาะเมื่อเบอร์ครบ 10 หลัก AND ไม่ได้นับถอยหลังอยู่
         if (!isTimerRunning) {
             if (isPhoneValid) {
                 otpBtn.removeAttribute('disabled');
@@ -159,6 +166,7 @@
             }
         }
 
+        // ปุ่ม Login: enable เฉพาะเมื่อทั้งเบอร์และ OTP ครบถ้วน
         if (isPhoneValid && isOtpValid) {
             loginBtn.removeAttribute('disabled');
             loginBtn.classList.remove('bg-[#FC938A]', 'cursor-not-allowed');
@@ -186,6 +194,8 @@
         startCountdown();
     });
 
+    // นับถอยหลัง 30 วินาที หลังกดส่ง OTP
+    // ระหว่างนั้น disable ปุ่ม OTP และแสดงเวลาที่เหลือ
     function startCountdown() {
         isTimerRunning = true;
         let timeLeft = 30;
@@ -207,19 +217,22 @@
         }, 1000);
     }
 
+    // กด Login สำเร็จ
     loginBtn.addEventListener('click', function () {
         if (!loginBtn.hasAttribute('disabled')) {
-            localStorage.setItem('isLoggedIn', 'true');
-            localStorage.setItem('savedPhone', phoneInput.value);
-            // กลับไปหน้าที่ค้างไว้ หรือ Main_Booking
+            localStorage.setItem('isLoggedIn', 'true');       // บันทึก login state
+            localStorage.setItem('savedPhone', phoneInput.value); // เก็บเบอร์ไว้ใช้ใน Booking
+            // กลับไปหน้าที่ค้างไว้ก่อน login
+            // ถ้าไม่มี (เข้ามาตรงๆ) ให้ไป Main_Booking
             const redirect = localStorage.getItem('redirectAfterLogin') || '/Booking/Main_Booking.html';
-            localStorage.removeItem('redirectAfterLogin');
+            localStorage.removeItem('redirectAfterLogin'); // ล้าง flag หลังใช้แล้ว
             window.location.href = redirect;
         }
     });
 
+    // รีเซตฟอร์มทุกครั้งที่โหลดหน้า (รวมถึงกด Back)
+    // ไม่แตะ redirectAfterLogin เพราะต้องเก็บไว้ใช้หลัง login
     window.addEventListener('pageshow', () => {
-        // reset form เท่านั้น ไม่แตะ redirectAfterLogin
         phoneInput.value = '';
         otpInput.value = '';
         checkInputs();

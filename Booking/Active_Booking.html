@@ -50,16 +50,21 @@
 </body>
 
 <script>
+    // เมื่อโหลดหน้าเสร็จ:
+    // 1. ตรวจและยกเลิก booking ที่เลยเวลาก่อน
+    // 2. แล้วค่อยแสดงผล
     document.addEventListener('DOMContentLoaded', () => {
         autoExpireBookings();
         renderActiveBookings();
     });
 
+    // ดึง booking ทั้งหมดจาก localStorage
     function getLocalBookings() {
         const stored = localStorage.getItem('coco_bookings');
         return stored ? JSON.parse(stored) : [];
     }
 
+    // จัดรูปแบบเบอร์โทร
     function maskPhoneNumber(phone) {
         if (!phone || phone.length < 10) return phone;
         return phone.substring(0, 3) + '-' + phone.substring(3, 10);
@@ -72,7 +77,8 @@
 
         container.innerHTML = '';
 
-        // กรองเอาเฉพาะสถานะ 'active' (หรือไม่มีสถานะก็ถือว่า active)
+        // กรองเฉพาะคิวที่ยังดำเนินการอยู่
+        // active = รอยืนยัน, processing = Admin อนุมัติแล้ว, !status = ข้อมูลเก่าที่ไม่มี field นี้
         const activeBookings = bookings.filter(b => b.status === 'active' || b.status === 'processing' || !b.status);
 
         if (activeBookings.length === 0) {
@@ -82,9 +88,10 @@
             noMsg.classList.add('hidden');
         }
 
-        // วนลูปแสดงผล (เรียงจากหลังมาหน้า)
+        // .slice().reverse() = copy array แล้วกลับด้าน (ล่าสุดขึ้นก่อน)
         activeBookings.slice().reverse().forEach((booking) => {
-            // ต้องหา index จริงใน array หลัก เพื่อส่งไปแก้ไข
+            // หา index จริงใน bookings (array หลัก) เพื่อใช้ใน cancelBooking()
+            // ใช้ indexOf เพราะ array ถูก reverse แล้ว index จึงไม่ตรงกับตำแหน่งจริง
             const realIndex = bookings.indexOf(booking);
 
             const displayDate = booking.date ? booking.date : new Date().toLocaleDateString('th-TH', { year: 'numeric', month: '2-digit', day: '2-digit' });
@@ -92,6 +99,9 @@
             const card = document.createElement('div');
             card.className = 'w-full bg-[#FFF0F0] rounded-2xl p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm';
 
+            // แยก UI ตามสถานะ:
+            // processing (Admin อนุมัติแล้ว) → การ์ดสีเหลือง ปุ่มยกเลิกถูกซ่อน
+            // active (รอยืนยัน) → การ์ดสีชมพู มีปุ่มยกเลิก
             const isProcessing = booking.status === 'processing';
             card.className = `w-full ${isProcessing ? 'bg-[#FFF8E1]' : 'bg-[#FFF0F0]'} rounded-2xl p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-sm`;
 
@@ -122,20 +132,22 @@
         });
     }
 
+    // ยกเลิกการจอง — ไม่ลบข้อมูลออกจาก array
+    // แต่เปลี่ยน status เป็น 'cancelled' แทน เพื่อให้ยังแสดงในหน้าประวัติได้
     function cancelBooking(index) {
         if (confirm('คุณต้องการยกเลิกการจองคิวนี้ใช่หรือไม่?')) {
             const bookings = getLocalBookings();
-
-            // *** จุดเปลี่ยนสำคัญ: ไม่ลบ (splice) แต่เปลี่ยนสถานะเป็น cancelled ***
             if (bookings[index]) {
-                bookings[index].status = 'cancelled';
+                bookings[index].status = 'cancelled'; // เปลี่ยน status แทนการลบ
                 localStorage.setItem('coco_bookings', JSON.stringify(bookings));
-                renderActiveBookings(); // รีเฟรชหน้า
+                renderActiveBookings(); // re-render หน้าใหม่
             }
         }
     }
 
     // ── ยกเลิกอัตโนมัติ: active ที่เลยเวลานัด 5 นาทีแล้ว ──
+    // ยกเลิกอัตโนมัติ: active booking ที่เลยเวลานัด + 5 นาทีแล้ว
+    // ทำงานทุกครั้งที่โหลดหน้า — ไม่มี background timer
     function autoExpireBookings() {
         const stored = localStorage.getItem('coco_bookings');
         if (!stored) return false;
@@ -144,28 +156,34 @@
         let changed = false;
 
         bookings.forEach(b => {
-            // ยกเลิกเฉพาะ active เท่านั้น (processing/completed/cancelled ไม่แตะ)
+            // ข้ามสถานะที่ไม่ควรแตะ
             if (b.status === 'processing' || b.status === 'completed' || b.status === 'cancelled') return;
-            if (!b.time) return;
+            if (!b.time) return; // ป้องกัน booking เก่าที่ไม่มี time
 
+            // parse เวลาจาก string เช่น '18:00 น.' → match[1]=18, match[2]=0
             const match = b.time.match(/(\d+):(\d+)/);
             if (!match) return;
 
             const bookingDate = b.date ? parseThaiDate(b.date) : new Date();
             if (!bookingDate) return;
 
+            // ตั้งเวลาในวัน booking ตาม hour:minute ที่ระบุ
             bookingDate.setHours(parseInt(match[1]), parseInt(match[2]), 0, 0);
+            // deadline = เวลานัด + 5 นาที
             const deadline = new Date(bookingDate.getTime() + 5 * 60 * 1000);
             if (now > deadline) {
-                b.status = 'cancelled';
+                b.status = 'cancelled'; // เลยเวลา → ยกเลิกอัตโนมัติ
                 changed = true;
             }
         });
 
+        // บันทึกเฉพาะเมื่อมีการเปลี่ยนแปลง
         if (changed) localStorage.setItem('coco_bookings', JSON.stringify(bookings));
         return changed;
     }
 
+    // แปลงวันที่ภาษาไทย เช่น '09/03/2568' → Date object
+    // ปีพุทธศักราช (> 2400) จะถูกแปลงเป็น ค.ศ. ก่อน
     function parseThaiDate(dateStr) {
         try {
             const parts = dateStr.match(/(\d+)\/(\d+)\/(\d+)/);

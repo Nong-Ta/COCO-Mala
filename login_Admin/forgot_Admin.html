@@ -92,14 +92,15 @@
             validateForm();
         });
 
+        // กดยืนยันตัวตน → เรียก verifyAdmin() จาก admin-data.js
+        // ถ้าชื่อ + เบอร์ถูกต้อง → บันทึก adminVerified='true' แล้วไปเปลี่ยนรหัส
+        // flag adminVerified ใช้เป็น guard ใน Change.html เพื่อป้องกันเข้าโดยตรง
         verifyBtn.addEventListener('click', () => {
             const name  = nameInput.value.trim();
             const phone = phoneInput.value.trim();
 
-            // ── ใช้ฟังก์ชันจาก admin-data.js ──
             if (verifyAdmin(name, phone)) {
-                // ยืนยันสำเร็จ → บันทึก flag แล้วไปหน้าเปลี่ยนรหัส
-                localStorage.setItem('adminVerified', 'true');
+                localStorage.setItem('adminVerified', 'true'); // เปิด gate ให้ Change.html
                 window.location.href = 'Change.html';
             } else {
                 errorModal.classList.remove('hidden');
