@@ -310,6 +310,52 @@
 
         // โหลดตารางตอนเปิดหน้า
         renderTable();
-    </script>
+    
+    // ── ยกเลิกอัตโนมัติ: active ที่เลยเวลานัด 5 นาทีแล้ว ──
+    function autoExpireBookings() {
+        const stored = localStorage.getItem('coco_bookings');
+        if (!stored) return false;
+        const bookings = JSON.parse(stored);
+        const now = new Date();
+        let changed = false;
+
+        bookings.forEach(b => {
+            // ยกเลิกเฉพาะ active เท่านั้น (processing/completed/cancelled ไม่แตะ)
+            if (b.status === 'processing' || b.status === 'completed' || b.status === 'cancelled') return;
+            if (!b.time) return;
+
+            const match = b.time.match(/(\d+):(\d+)/);
+            if (!match) return;
+
+            const bookingDate = b.date ? parseThaiDate(b.date) : new Date();
+            if (!bookingDate) return;
+
+            bookingDate.setHours(parseInt(match[1]), parseInt(match[2]), 0, 0);
+            const deadline = new Date(bookingDate.getTime() + 5 * 60 * 1000);
+            if (now > deadline) {
+                b.status = 'cancelled';
+                changed = true;
+            }
+        });
+
+        if (changed) localStorage.setItem('coco_bookings', JSON.stringify(bookings));
+        return changed;
+    }
+
+    function parseThaiDate(dateStr) {
+        try {
+            const parts = dateStr.match(/(\d+)\/(\d+)\/(\d+)/);
+            if (parts) {
+                const day = parseInt(parts[1]);
+                const month = parseInt(parts[2]) - 1;
+                let year = parseInt(parts[3]);
+                if (year > 2400) year -= 543;
+                return new Date(year, month, day);
+            }
+        } catch(e) {}
+        return new Date();
+    }
+
+</script>
 </body>
 </html>
