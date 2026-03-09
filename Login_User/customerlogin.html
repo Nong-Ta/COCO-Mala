@@ -232,7 +232,7 @@
                 redirect = '/Booking/Main_Booking.html';
             } else if (!redirect.startsWith('/')) {
                 // ถ้าจำมาแค่ชื่อไฟล์ เช่น 'Booking.html' ให้เติมโฟลเดอร์ให้สมบูรณ์
-                redirect = '/Booking/' + redirect.replace('../', ''); 
+                redirect = '/Booking/' + redirect; 
             }
 
             localStorage.removeItem('redirectAfterLogin'); 
