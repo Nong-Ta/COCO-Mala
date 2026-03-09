@@ -143,8 +143,8 @@
         if (isLoggedIn()) {
             window.location.href = page;
         } else {
-            localStorage.setItem('redirectAfterLogin', page); // จำหน้าที่จะไป
-            window.location.href = '../Login_User/customerlogin.html';
+            localStorage.setItem('redirectAfterLogin','/Booking' + page); // จำหน้าที่จะไป
+            window.location.href = '/Login_User/customerlogin.html';
         }
     }
 
@@ -153,7 +153,7 @@
         if (confirm('ต้องการออกจากระบบใช่หรือไม่?')) {
             localStorage.removeItem('isLoggedIn');  // ล้าง login flag
             localStorage.removeItem('savedPhone');  // ล้างเบอร์ที่บันทึกไว้
-            window.location.href = '../Login_User/customerlogin.html';
+            window.location.href = '/Login_User/customerlogin.html';
         }
     }
 
@@ -163,7 +163,7 @@
         if (isLoggedIn()) {
             el.innerHTML = `<a href="#" onclick="logout()" class="text-[#EE3F3E] font-semibold hover:underline no-underline cursor-pointer">ออกจากระบบ</a>`;
         } else {
-            el.innerHTML = `<a href="../Login_User/customerlogin.html" class="px-4 py-1.5 bg-[#EE3F3E] text-white rounded-lg font-semibold hover:bg-[#C93030] transition-colors no-underline">เข้าสู่ระบบ</a>`;
+            el.innerHTML = `<a href="/Login_User/customerlogin.html" class="px-4 py-1.5 bg-[#EE3F3E] text-white rounded-lg font-semibold hover:bg-[#C93030] transition-colors no-underline">เข้าสู่ระบบ</a>`;
         }
     }
 

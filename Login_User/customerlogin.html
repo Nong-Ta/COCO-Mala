@@ -220,13 +220,23 @@
     // กด Login สำเร็จ
     loginBtn.addEventListener('click', function () {
         if (!loginBtn.hasAttribute('disabled')) {
-            localStorage.setItem('isLoggedIn', 'true');       // บันทึก login state
-            localStorage.setItem('savedPhone', phoneInput.value); // เก็บเบอร์ไว้ใช้ใน Booking
-            // กลับไปหน้าที่ค้างไว้ก่อน login
-            // ถ้าไม่มี (เข้ามาตรงๆ) ให้ไป Main_Booking
-            const redirect = localStorage.getItem('redirectAfterLogin') || '/Booking/Main_Booking.html';
-            localStorage.removeItem('redirectAfterLogin'); // ล้าง flag หลังใช้แล้ว
-            window.location.href = redirect;
+            localStorage.setItem('isLoggedIn', 'true');       
+            localStorage.setItem('savedPhone', phoneInput.value); 
+            
+            // 1. ดึงค่าหน้าที่ค้างไว้
+            let redirect = localStorage.getItem('redirectAfterLogin');
+            
+            // 2. แปลง Path ให้ไปถูกที่เสมอ (แก้ 404)
+            if (!redirect) {
+                // ถ้าไม่มีค่าจำไว้ ให้ไปหน้า Main_Booking
+                redirect = '/Booking/Main_Booking.html';
+            } else if (!redirect.startsWith('/')) {
+                // ถ้าจำมาแค่ชื่อไฟล์ เช่น 'Booking.html' ให้เติมโฟลเดอร์ให้สมบูรณ์
+                redirect = '/Booking/' + redirect.replace('../', ''); 
+            }
+
+            localStorage.removeItem('redirectAfterLogin'); 
+            window.location.href = redirect; // สั่งเปลี่ยนหน้า
         }
     });
 
