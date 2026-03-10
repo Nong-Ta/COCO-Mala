@@ -11,7 +11,7 @@ const ADMIN_STORAGE_KEY = 'coco_admin';
 // เปลี่ยนรหัสผ่านได้ผ่านหน้า forgot_Admin.html
 const DEFAULT_ADMIN = {
     username: 'Admin',
-    phone: '0999999999',
+    phone: '0947983704',
     password: 'Admin1234'
 };
 
