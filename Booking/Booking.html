@@ -182,6 +182,14 @@
 </body>
 
 <script>
+    const MAX_TABLES = 10; // จำนวนโต๊ะสูงสุดในร้าน
+    let currentPax = null;
+
+    // สร้าง dropdown เวลาเมื่อโหลด DOM เสร็จ
+    document.addEventListener('DOMContentLoaded', () => {
+        generateTimeOptions();
+    });
+
     // จัดรูปแบบเบอร์โทร 10 หลัก
     // ใช้แสดงในหน้า success เท่านั้น (ไม่ได้บันทึกรูปแบบนี้)
     function formatPhoneNumber(phoneNumberString) {
