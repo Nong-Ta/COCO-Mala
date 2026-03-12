@@ -250,13 +250,20 @@
     // ง่ายต่อการปรับเปลี่ยนช่วงเวลาเปิด-ปิดร้าน
     function generateTimeOptions() {
         const container = document.getElementById('time-options');
+        const now = new Date();
         let html = '';
         for (let i = 11; i <= 21; i++) {
-            const timeText = `${i}:00 น.`;
-            html += `<div onclick="selectTime('${timeText}')" 
-                            class="p-3 text-center border-b border-gray-200 cursor-pointer hover:bg-gray-200 text-gray-700 last:border-b-0 transition">
-                            ${timeText}
-                         </div>`;
+            const slotTime = new Date();
+            slotTime.setHours(i, 0, 0, 0);
+            // แสดงเฉพาะเวลาที่ยังไม่ผ่านมา (+5 นาที buffer)
+            if (slotTime.getTime() > now.getTime() + 5 * 60 * 1000) {
+                const timeText = `${i}:00 น.`;
+                html += `<div onclick="selectTime('${timeText}')" class="p-3 text-center border-b border-gray-200 cursor-pointer hover:bg-gray-200 text-gray-700 last:border-b-0 transition">${timeText}</div>`;
+            }
+        }
+        // ถ้าไม่มีเวลาให้เลือก
+        if (!html) {
+            html = `<div class="p-4 text-center text-gray-400 text-sm">ไม่มีเวลาว่างในวันนี้แล้ว</div>`;
         }
         container.innerHTML = html;
     }
