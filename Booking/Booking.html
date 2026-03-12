@@ -38,7 +38,7 @@
     </style>
 </head>
 
-<body class="bg-white text-gray-800 font-sans" onclick="closeDropdown(event)">
+<body class="bg-gray-50 text-gray-800 font-sans" onclick="closeDropdown(event)">
 
     <nav class="border-b border-gray-200 py-4 px-6 flex justify-between items-center bg-white sticky top-0 z-50">
         <div class="flex items-center gap-2">
@@ -60,8 +60,9 @@
     <main class="max-w-xl mx-auto mt-12 px-4 pb-20">
 
         <div id="booking-section">
-            <h1 class="text-4xl font-medium text-center mb-10">จองคิว</h1>
+            <h1 class="text-4xl font-medium text-center mb-8">จองคิว</h1>
 
+            <div class="bg-white rounded-2xl shadow-md border border-gray-100 px-8 py-8">
             <div class="space-y-5">
                 <div class="flex flex-col gap-1">
                     <label for="name" class="font-medium text-gray-700">ชื่อ :</label>
@@ -83,16 +84,16 @@
                     <label class="font-medium text-gray-700">จำนวนคน :</label>
                     <div class="flex gap-3" id="pax-container">
                         <button onclick="selectPax(1)"
-                            class="pax-btn w-12 h-12 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition"
+                            class="pax-btn w-12 h-12 border border-gray-200 rounded-xl bg-gray-50 flex items-center justify-center hover:bg-gray-200 transition font-medium text-gray-700 shadow-sm"
                             data-value="1">1</button>
                         <button onclick="selectPax(2)"
-                            class="pax-btn w-12 h-12 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition"
+                            class="pax-btn w-12 h-12 border border-gray-200 rounded-xl bg-gray-50 flex items-center justify-center hover:bg-gray-200 transition font-medium text-gray-700 shadow-sm"
                             data-value="2">2</button>
                         <button onclick="selectPax(3)"
-                            class="pax-btn w-12 h-12 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition"
+                            class="pax-btn w-12 h-12 border border-gray-200 rounded-xl bg-gray-50 flex items-center justify-center hover:bg-gray-200 transition font-medium text-gray-700 shadow-sm"
                             data-value="3">3</button>
                         <button onclick="selectPax(4)"
-                            class="pax-btn w-12 h-12 border border-gray-200 rounded-lg flex items-center justify-center hover:bg-gray-50 transition"
+                            class="pax-btn w-12 h-12 border border-gray-200 rounded-xl bg-gray-50 flex items-center justify-center hover:bg-gray-200 transition font-medium text-gray-700 shadow-sm"
                             data-value="4">4</button>
                     </div>
                     <input type="hidden" id="pax-value" value="">
@@ -125,6 +126,7 @@
                     </button>
                 </div>
             </div>
+            </div><!-- end card -->
         </div>
 
         <div id="full-section" class="hidden flex flex-col items-center justify-center min-h-[50vh] text-center">

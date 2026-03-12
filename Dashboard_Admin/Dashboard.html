@@ -161,10 +161,18 @@
                 return;
             }
 
-            bookings.forEach((b, index) => {
+            // เรียงลำดับ: รอยืนยัน → กำลังดำเนินการ → เสร็จสิ้น (สีเขนน้อย = ขึ้นก่อน)
+            const statusOrder = { 'active': 0, 'processing': 1, 'completed': 2 };
+            // map index จริงไว้ก่อน sort เพราะต้องส่ง index ที่ถูกต้องไป showModal/skipRow
+            const sorted = bookings
+                .map((b, i) => ({ b, index: i }))
+                .filter(({ b }) => b.status !== 'cancelled')
+                .sort((a, z) => (statusOrder[a.b.status] ?? 0) - (statusOrder[z.b.status] ?? 0));
+
+            sorted.forEach(({ b, index }) => {
                 const isCompleted = b.status === 'completed';
                 const isCancelled = b.status === 'cancelled';
-                if (isCancelled) return; // ไม่แสดงที่ยกเลิกแล้ว
+                if (isCancelled) return;
 
                 const isProcessing = b.status === 'processing';
 
@@ -278,7 +286,8 @@
             document.getElementById('booking-modal').classList.add('hidden');
         }
 
-        // --- ตรวจสอบการจองจากเบอร์ ---
+        // ตรวจสอบการจองจากเบอร์
+        // ค้นหา active/processing ล่าสุดก่อน ถ้าไม่มีค่อยหา completed เพื่อป้องกันเบอร์เดิมจองซ้ำแสดงข้อมูลเก่า
         function checkBooking() {
             const phone = document.getElementById('booking-phone').value;
             if (phone.length !== 10) {
@@ -286,7 +295,17 @@
                 return;
             }
             const bookings = getBookings();
-            const index = bookings.findIndex(b => b.phone === phone && b.status !== 'cancelled');
+            // หา active/processing ก่อน (คิูที่ยังดำเนินอยู่ = สำคัญกว่า)
+            let index = bookings.findIndex(b => b.phone === phone && (b.status === 'active' || b.status === 'processing'));
+            // ถ้าไม่มีคิู active ค่อยหา completed ล่าสุด (วนสุดท้ายย้อนหลัง)
+            if (index === -1) {
+                for (let i = bookings.length - 1; i >= 0; i--) {
+                    if (bookings[i].phone === phone && bookings[i].status !== 'cancelled') {
+                        index = i;
+                        break;
+                    }
+                }
+            }
             if (index !== -1) {
                 showModal(index);
             } else {
