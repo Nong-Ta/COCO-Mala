@@ -134,7 +134,7 @@
             <p id="full-time-display" class="text-2xl font-bold text-gray-800 mb-4">เวลา XX:XX น.</p>
             <p class="text-2xl font-bold text-gray-800 mb-10">ในขณะนี้ไม่มีโต๊ะว่าง</p>
             <button onclick="goToHome()"
-                class="px-8 py-3 bg-[#EE3F3E] text-white font-bold text-xl rounded-xl hover:bg-red-600 transition shadow-md w-full max-w-xs">กลับสู่หน้าหลัก</button>
+                class="px-8 py-3 bg-green-600 text-white font-bold text-xl rounded-xl hover:bg-green-700 transition shadow-md w-full max-w-xs">กลับสู่หน้าหลัก</button>
         </div>
 
         <div id="success-section" class="hidden flex flex-col items-center">
@@ -161,7 +161,7 @@
 
             <div class="flex flex-col items-center gap-4 w-full">
                 <button onclick="goToHome()"
-                    class="w-48 py-3 bg-[#FF5C35] text-white font-bold text-lg rounded-xl hover:bg-red-600 transition shadow-md">กลับสู่หน้าหลัก</button>
+                    class="w-48 py-3 bg-green-600 text-white font-bold text-lg rounded-xl hover:bg-green-700 transition shadow-md">กลับสู่หน้าหลัก</button>
                 <button onclick="openCancelModal()"
                     class="text-gray-500 font-medium border-b border-gray-400 pb-0.5 hover:text-gray-800 transition">ยกเลิกการจอง</button>
             </div>
@@ -213,11 +213,11 @@
         const btn = document.getElementById('submit-btn');
 
         if (name && phone.length === 10 && pax && time) {
-            btn.classList.replace('bg-primaryLight', 'bg-[#EE3F3E]'); // เปิด
-            btn.classList.add('hover:bg-red-400');
+            btn.classList.replace('bg-primaryLight', 'bg-green-600'); // เปิด
+            btn.classList.add('hover:bg-green-700');
         } else {
-            btn.classList.replace('bg-[#EE3F3E]', 'bg-primaryLight'); // ปิด
-            btn.classList.remove('hover:bg-red-400');
+            btn.classList.replace('bg-green-600', 'bg-primaryLight'); // ปิด
+            btn.classList.remove('hover:bg-green-700');
         }
     }
 
